@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">️ LMS System</a>
+        <a class="navbar-brand" href="/">🏆 Трекер Привычек</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -11,39 +11,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Главная</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'courses:course-list' %}">Курсы (API)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'courses:lessons_list' %}">Уроки (API)</a>
-                </li>
-
-                <!-- Кнопки только для менеджеров и админов -->
-                {% if user.is_authenticated and user.role == 'manager' or user.is_staff %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        🛠️ Управление
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="/users/manager/users/html/">
-                                👥 Пользователи
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/users/api/users/">
-                                📊 Пользователи (API)
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/admin/">
-                                ⚙️ Админка
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                {% endif %}
+                <!-- Здесь позже появятся ссылки на Привычки -->
             </ul>
 
             <ul class="navbar-nav">
@@ -57,15 +25,22 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a class="dropdown-item" href="/users/api/profile/">
-                                📝 Мой профиль (API)
+                            <a class="dropdown-item" href="{% url 'user:profile_edit' %}">
+                                📝 Мой профиль
+                            </a>
+                        </li>
+                        {% if user.role == 'manager' or user.is_staff %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'user:user_list' %}">
+                                👥 Пользователи
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="/users/api/profile/update/">
-                                ✏️ Редактировать профиль
+                            <a class="dropdown-item" href="/admin/">
+                                ⚙️ Админка
                             </a>
                         </li>
+                        {% endif %}
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <form method="post" action="{% url 'user:logout' %}">
@@ -76,11 +51,12 @@
                     </ul>
                 </li>
                 {% else %}
+                <!-- КНОПКИ ДЛЯ НЕАВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ -->
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/login/">Войти</a>
+                    <a class="nav-link" href="{% url 'user:login' %}">Войти</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/users/register/">Регистрация</a>
+                    <a class="btn btn-primary ms-2" href="{% url 'user:register' %}" role="button">Регистрация</a>
                 </li>
                 {% endif %}
             </ul>

@@ -1,19 +1,51 @@
 {% extends "base.html" %}
-{% block title %}Главная - LMS{% endblock %}
+{% block title %}Главная - Трекер Привычек{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="jumbotron bg-light p-5 rounded">
-        <h1 class="display-4">Добро пожаловать в Learning Management System!</h1>
-        <p class="lead">Ваша платформа для онлайн-обучения</p>
+        <h1 class="display-4">Добро пожаловать в Трекер Привычек! 🚀</h1>
+        <p class="lead">Создавай полезные привычки, отслеживай свой прогресс и становись лучше с каждым днем.</p>
         <hr class="my-4">
-        <p>Изучайте курсы, проходите уроки и отслеживайте свой прогресс</p>
+        <p>Наша платформа поможет тебе выработать ритм, получать напоминания и анализировать свои успехи.</p>
         {% if not user.is_authenticated %}
-        <a class="btn btn-primary btn-lg" href="{% url 'user:register' %}" role="button">Начать обучение</a>
+        <a class="btn btn-primary btn-lg me-2" href="{% url 'user:register' %}" role="button">Начать меняться</a>
+        <a class="btn btn-outline-secondary btn-lg" href="{% url 'user:login' %}" role="button">Войти</a>
         {% else %}
-        <a class="btn btn-success btn-lg" href="{% url 'courses:course-list' %}" role="button">К курсам (API)</a>
-        <a class="btn btn-info btn-lg ms-2" href="{% url 'courses:lessons_list' %}" role="button">К урокам (API)</a>
+        <!-- Ссылки будут актуальны после создания приложения habits -->
+        <a class="btn btn-success btn-lg" href="#" role="button">Мои привычки</a>
+        <a class="btn btn-info btn-lg ms-2" href="#" role="button">Создать привычку</a>
         {% endif %}
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📋</h5>
+                    <h5 class="card-title">Создавай</h5>
+                    <p class="card-text">Определи цель, частоту и время для своих полезных привычек.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🔔</h5>
+                    <h5 class="card-title">Отслеживай</h5>
+                    <p class="card-text">Получай уведомления и отмечай выполнение каждого шага.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">📈</h5>
+                    <h5 class="card-title">Анализируй</h5>
+                    <p class="card-text">Смотри на свою статистику и мотивируй себя на новые свершения.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

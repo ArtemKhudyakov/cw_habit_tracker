@@ -1,0 +1,1189 @@
+﻿================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\asgi.py
+================================================================================
+0001: """
+0002: ASGI config for config project.
+0003: 
+0004: It exposes the ASGI callable as a module-level variable named ``application``.
+0005: 
+0006: For more information on this file, see
+0007: https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
+0008: """
+0009: 
+0010: import os
+0011: 
+0012: from django.core.asgi import get_asgi_application
+0013: 
+0014: os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+0015: 
+0016: application = get_asgi_application()
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\settings.py
+================================================================================
+0001: import os
+0002: from datetime import timedelta
+0003: from pathlib import Path
+0004: 
+0005: from dotenv import load_dotenv
+0006: 
+0007: load_dotenv(override=True)
+0008: 
+0009: # Build paths inside the project like this: BASE_DIR / 'subdir'.
+0010: BASE_DIR = Path(__file__).resolve().parent.parent
+0011: 
+0012: # Quick-start development settings - unsuitable for production
+0013: # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+0014: 
+0015: # SECURITY WARNING: keep the secret key used in production secret!
+0016: SECRET_KEY = os.getenv('SECRET_KEY')
+0017: 
+0018: # SECURITY WARNING: don't run with debug turned on in production!
+0019: DEBUG = True if os.getenv("DEBUG") == "True" else False
+0020: 
+0021: ALLOWED_HOSTS = []
+0022: 
+0023: # Application definition
+0024: 
+0025: INSTALLED_APPS = [
+0026:     'django.contrib.admin',
+0027:     'django.contrib.auth',
+0028:     'django.contrib.contenttypes',
+0029:     'django.contrib.sessions',
+0030:     'django.contrib.messages',
+0031:     'django.contrib.staticfiles',
+0032:     "django_filters",
+0033:     "rest_framework",
+0034:     "rest_framework_simplejwt",
+0035:     "django_extensions",
+0036:     "drf_yasg",
+0037:     'django_celery_beat',
+0038:     'django_celery_results',
+0039:     'user',
+0040:     'habits',
+0041: ]
+0042: 
+0043: MIDDLEWARE = [
+0044:     'django.middleware.security.SecurityMiddleware',
+0045:     'django.contrib.sessions.middleware.SessionMiddleware',
+0046:     'django.middleware.common.CommonMiddleware',
+0047:     'django.middleware.csrf.CsrfViewMiddleware',
+0048:     'django.contrib.auth.middleware.AuthenticationMiddleware',
+0049:     'django.contrib.messages.middleware.MessageMiddleware',
+0050:     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+0051: ]
+0052: 
+0053: ROOT_URLCONF = 'config.urls'
+0054: 
+0055: TEMPLATES = [
+0056:     {
+0057:         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+0058:         'DIRS': [BASE_DIR / 'templates']
+0059:         ,
+0060:         'APP_DIRS': True,
+0061:         'OPTIONS': {
+0062:             'context_processors': [
+0063:                 'django.template.context_processors.request',
+0064:                 'django.contrib.auth.context_processors.auth',
+0065:                 'django.contrib.messages.context_processors.messages',
+0066:             ],
+0067:         },
+0068:     },
+0069: ]
+0070: 
+0071: WSGI_APPLICATION = 'config.wsgi.application'
+0072: 
+0073: # Database
+0074: # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+0075: 
+0076: DATABASES = {
+0077:     "default": {
+0078:         "ENGINE": "django.db.backends.postgresql_psycopg2",
+0079:         "NAME": os.getenv("NAME"),
+0080:         "USER": os.getenv("USER"),
+0081:         "PASSWORD": os.getenv("DB_PASSWORD"),
+0082:         "HOST": os.getenv("HOST"),
+0083:         "PORT": os.getenv("PORT"),
+0084:     }
+0085: }
+0086: 
+0087: # Password validation
+0088: # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
+0089: 
+0090: AUTH_PASSWORD_VALIDATORS = [
+0091:     {
+0092:         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+0093:     },
+0094:     {
+0095:         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+0096:     },
+0097:     {
+0098:         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+0099:     },
+0100:     {
+0101:         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+0102:     },
+0103: ]
+0104: 
+0105: REST_FRAMEWORK = {
+0106:     "DEFAULT_FILTER_BACKENDS": [
+0107:         "django_filters.rest_framework.DjangoFilterBackend",
+0108:         "rest_framework.filters.OrderingFilter",
+0109:     ],
+0110:     "DEFAULT_AUTHENTICATION_CLASSES": [
+0111:         "rest_framework_simplejwt.authentication.JWTAuthentication",
+0112:         "rest_framework.authentication.SessionAuthentication",
+0113:         "rest_framework.authentication.TokenAuthentication",
+0114:     ],
+0115:     "DEFAULT_PERMISSION_CLASSES": [
+0116:         "rest_framework.permissions.IsAuthenticated",
+0117:     ],
+0118: }
+0119: 
+0120: # Internationalization
+0121: # https://docs.djangoproject.com/en/5.2/topics/i18n/
+0122: 
+0123: LANGUAGE_CODE = "en-us"
+0124: 
+0125: USE_I18N = True
+0126: 
+0127: USE_TZ = True
+0128: 
+0129: TIME_ZONE = "Europe/Moscow"
+0130: 
+0131: # Static files (CSS, JavaScript, Images)
+0132: # https://docs.djangoproject.com/en/5.2/howto/static-files/
+0133: 
+0134: STATIC_URL = "static/"
+0135: STATICFILES_DIRS = (BASE_DIR / "static",)
+0136: STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+0137: STATIC_ROOT = BASE_DIR / "staticfiles"
+0138: 
+0139: # Default primary key field type
+0140: # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+0141: 
+0142: DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+0143: 
+0144: DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+0145: 
+0146: MEDIA_URL = "media/"
+0147: 
+0148: MEDIA_ROOT = BASE_DIR / "media"
+0149: 
+0150: AUTH_USER_MODEL = "user.User"
+0151: 
+0152: LOGIN_REDIRECT_URL = "home"
+0153: LOGOUT_REDIRECT_URL = "home"
+0154: LOGIN_URL = "user:login"
+0155: 
+0156: EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+0157: EMAIL_HOST = os.getenv("EMAIL_HOST")
+0158: EMAIL_PORT = os.getenv("EMAIL_PORT")
+0159: EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+0160: EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+0161: EMAIL_USE_TLS = False
+0162: EMAIL_USE_SSL = True
+0163: DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")  # Р’Р°С€ yandex email
+0164: SERVER_EMAIL = os.getenv("EMAIL_HOST_USER")  # Р”Р»СЏ РѕС€РёР±РѕРє
+0165: 
+0166: CACHES = {
+0167:     "default": {
+0168:         "BACKEND": "django_redis.cache.RedisCache",
+0169:         "LOCATION": "redis://127.0.0.1:6379/2",
+0170:         "OPTIONS": {
+0171:             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+0172:         },
+0173:         "KEY_PREFIX": "mail_service_",
+0174:         "TIMEOUT": 60 * 15,  # 15 РјРёРЅСѓС‚
+0175:     }
+0176: }
+0177: 
+0178: SIMPLE_JWT = {
+0179:     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60 * 2),
+0180:     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+0181: }
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\urls.py
+================================================================================
+0001: 
+0002: from django.conf import settings
+0003: from django.conf.urls.static import static
+0004: from django.contrib import admin
+0005: from django.urls import include, path
+0006: from django.views.generic import TemplateView
+0007: 
+0008: urlpatterns = [
+0009:     path('admin/', admin.site.urls),
+0010:     path("", TemplateView.as_view(template_name="home.html"), name="home"),
+0011:     path("user/", include("user.urls", namespace="user"))
+0012: ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\wsgi.py
+================================================================================
+0001: """
+0002: WSGI config for config project.
+0003: 
+0004: It exposes the WSGI callable as a module-level variable named ``application``.
+0005: 
+0006: For more information on this file, see
+0007: https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
+0008: """
+0009: 
+0010: import os
+0011: 
+0012: from django.core.wsgi import get_wsgi_application
+0013: 
+0014: os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+0015: 
+0016: application = get_wsgi_application()
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\migrations\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\admin.py
+================================================================================
+0001: from django.contrib import admin
+0002: 
+0003: # Register your models here.
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\apps.py
+================================================================================
+0001: from django.apps import AppConfig
+0002: 
+0003: 
+0004: class HabbitsConfig(AppConfig):
+0005:     default_auto_field = 'django.db.models.BigAutoField'
+0006:     name = 'habits'
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\models.py
+================================================================================
+0001: from django.db import models
+0002: 
+0003: # Create your models here.
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\tests.py
+================================================================================
+0001: from django.test import TestCase
+0002: 
+0003: # Create your tests here.
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\views.py
+================================================================================
+0001: from django.shortcuts import render
+0002: 
+0003: # Create your views here.
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\management\commands\create_superuser.py
+================================================================================
+0001: import os
+0002: 
+0003: from django.core.management import BaseCommand
+0004: from dotenv import load_dotenv
+0005: 
+0006: from ...models import User
+0007: 
+0008: load_dotenv(override=True)
+0009: 
+0010: 
+0011: class Command(BaseCommand):
+0012:     def handle(self, *args, **options):
+0013:         user = User.objects.create_superuser(username=os.getenv("ADMIN_USERNAME"), email=os.getenv("ADMIN_EMAIL"))
+0014: 
+0015:         user.set_password(os.getenv("ADMIN_PASSWORD"))
+0016:         user.is_active = True
+0017:         user.is_staff = True
+0018:         user.is_superuser = True
+0019:         user.save()
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\management\commands\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\management\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\migrations\0001_initial.py
+================================================================================
+0001: # Generated by Django 5.2.6 on 2025-09-18 18:50
+0002: 
+0003: import django.contrib.auth.models
+0004: import django.core.validators
+0005: import django.utils.timezone
+0006: import phonenumber_field.modelfields
+0007: from django.db import migrations, models
+0008: 
+0009: 
+0010: class Migration(migrations.Migration):
+0011: 
+0012:     initial = True
+0013: 
+0014:     dependencies = [
+0015:         ("auth", "0012_alter_user_first_name_max_length"),
+0016:     ]
+0017: 
+0018:     operations = [
+0019:         migrations.CreateModel(
+0020:             name="User",
+0021:             fields=[
+0022:                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+0023:                 ("password", models.CharField(max_length=128, verbose_name="password")),
+0024:                 ("last_login", models.DateTimeField(blank=True, null=True, verbose_name="last login")),
+0025:                 (
+0026:                     "is_superuser",
+0027:                     models.BooleanField(
+0028:                         default=False,
+0029:                         help_text="Designates that this user has all permissions without explicitly assigning them.",
+0030:                         verbose_name="superuser status",
+0031:                     ),
+0032:                 ),
+0033:                 ("first_name", models.CharField(blank=True, max_length=150, verbose_name="first name")),
+0034:                 ("last_name", models.CharField(blank=True, max_length=150, verbose_name="last name")),
+0035:                 (
+0036:                     "is_staff",
+0037:                     models.BooleanField(
+0038:                         default=False,
+0039:                         help_text="Designates whether the user can log into this admin site.",
+0040:                         verbose_name="staff status",
+0041:                     ),
+0042:                 ),
+0043:                 (
+0044:                     "is_active",
+0045:                     models.BooleanField(
+0046:                         default=True,
+0047:                         help_text="Designates whether this user should be treated as active. Unselect this instead of deleting accounts.",
+0048:                         verbose_name="active",
+0049:                     ),
+0050:                 ),
+0051:                 ("date_joined", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date joined")),
+0052:                 (
+0053:                     "username",
+0054:                     models.CharField(
+0055:                         help_text="Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0056:                         max_length=50,
+0057:                         unique=True,
+0058:                         verbose_name="РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0059:                     ),
+0060:                 ),
+0061:                 (
+0062:                     "email",
+0063:                     models.EmailField(
+0064:                         help_text="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹", max_length=254, unique=True, verbose_name="email"
+0065:                     ),
+0066:                 ),
+0067:                 (
+0068:                     "country",
+0069:                     models.CharField(
+0070:                         blank=True, help_text="Р’РІРµРґРёС‚Рµ СЃС‚СЂР°РЅСѓ", max_length=50, null=True, verbose_name="РЎС‚СЂР°РЅР°"
+0071:                     ),
+0072:                 ),
+0073:                 (
+0074:                     "city",
+0075:                     models.CharField(
+0076:                         blank=True, help_text="Р’РІРµРґРёС‚Рµ РіРѕСЂРѕРґ", max_length=50, null=True, verbose_name="Р“РѕСЂРѕРґ"
+0077:                     ),
+0078:                 ),
+0079:                 (
+0080:                     "phone",
+0081:                     phonenumber_field.modelfields.PhoneNumberField(
+0082:                         blank=True,
+0083:                         help_text="Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°",
+0084:                         max_length=128,
+0085:                         null=True,
+0086:                         region=None,
+0087:                         verbose_name="РўРµР»РµС„РѕРЅ",
+0088:                     ),
+0089:                 ),
+0090:                 (
+0091:                     "avatar",
+0092:                     models.ImageField(
+0093:                         blank=True,
+0094:                         help_text="Р—Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Р°РІР°С‚Р°СЂР°",
+0095:                         null=True,
+0096:                         upload_to="user/avatars",
+0097:                         validators=[
+0098:                             django.core.validators.FileExtensionValidator(
+0099:                                 allowed_extensions=["jfif", "jpg", "jpeg", "png"]
+0100:                             )
+0101:                         ],
+0102:                         verbose_name="РђРІР°С‚Р°СЂ",
+0103:                     ),
+0104:                 ),
+0105:                 ("token", models.CharField(blank=True, max_length=100, null=True, verbose_name="РўРѕРєРµРЅ")),
+0106:                 ("is_verified", models.BooleanField(default=False, verbose_name="РџРѕРґС‚РІРµСЂР¶РґРµРЅ")),
+0107:                 (
+0108:                     "role",
+0109:                     models.CharField(
+0110:                         choices=[("user", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"), ("manager", "РњРµРЅРµРґР¶РµСЂ"), ("moderator", "РњРѕРґРµСЂР°С‚РѕСЂ")],
+0111:                         default="user",
+0112:                         max_length=10,
+0113:                         verbose_name="Р РѕР»СЊ",
+0114:                     ),
+0115:                 ),
+0116:                 ("is_blocked", models.BooleanField(default=False, verbose_name="Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ")),
+0117:                 (
+0118:                     "groups",
+0119:                     models.ManyToManyField(
+0120:                         blank=True,
+0121:                         help_text="The groups this user belongs to. A user will get all permissions granted to each of their groups.",
+0122:                         related_name="user_set",
+0123:                         related_query_name="user",
+0124:                         to="auth.group",
+0125:                         verbose_name="groups",
+0126:                     ),
+0127:                 ),
+0128:                 (
+0129:                     "user_permissions",
+0130:                     models.ManyToManyField(
+0131:                         blank=True,
+0132:                         help_text="Specific permissions for this user.",
+0133:                         related_name="user_set",
+0134:                         related_query_name="user",
+0135:                         to="auth.permission",
+0136:                         verbose_name="user permissions",
+0137:                     ),
+0138:                 ),
+0139:             ],
+0140:             options={
+0141:                 "verbose_name": "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+0142:                 "verbose_name_plural": "РџРѕР»СЊР·РѕРІР°С‚РµР»Рё",
+0143:                 "db_table": "user",
+0144:                 "permissions": [
+0145:                     ("block_user", "РњРѕР¶РµС‚ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"),
+0146:                     ("disable_mailing", "РњРѕР¶РµС‚ РѕС‚РєР»СЋС‡Р°С‚СЊ СЂР°СЃСЃС‹Р»РєРё"),
+0147:                 ],
+0148:             },
+0149:             managers=[
+0150:                 ("objects", django.contrib.auth.models.UserManager()),
+0151:             ],
+0152:         ),
+0153:     ]
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\migrations\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\admin.py
+================================================================================
+0001: from django.contrib import admin
+0002: from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+0003: from django.utils.translation import gettext_lazy as _
+0004: 
+0005: from .models import User
+0006: 
+0007: 
+0008: class UserAdmin(BaseUserAdmin):
+0009:     list_display = ("id", "username", "email", "role", "is_blocked", "is_staff", "is_superuser")
+0010:     list_filter = ("role", "is_blocked", "is_staff", "is_superuser")
+0011:     search_fields = ("username", "email")
+0012:     ordering = ("username",)
+0013: 
+0014:     fieldsets = (
+0015:         (None, {"fields": ("username", "password")}),
+0016:         (_("Personal info"), {"fields": ("email", "country", "phone", "avatar")}),
+0017:         (
+0018:             _("Permissions"),
+0019:             {
+0020:                 "fields": (
+0021:                     "is_active",
+0022:                     "is_blocked",
+0023:                     "is_verified",
+0024:                     "is_staff",
+0025:                     "is_superuser",
+0026:                     "role",
+0027:                     "groups",
+0028:                     "user_permissions",
+0029:                 ),
+0030:             },
+0031:         ),
+0032:         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+0033:     )
+0034: 
+0035:     add_fieldsets = (
+0036:         (
+0037:             None,
+0038:             {
+0039:                 "classes": ("wide",),
+0040:                 "fields": ("username", "email", "password1", "password2", "role"),
+0041:             },
+0042:         ),
+0043:     )
+0044: 
+0045:     actions = ["block_users", "unblock_users", "make_managers", "make_regular_users"]
+0046: 
+0047:     def block_users(self, request, queryset):
+0048:         queryset.update(is_blocked=True)
+0049:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
+0050: 
+0051:     block_users.short_description = "Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+0052: 
+0053:     def unblock_users(self, request, queryset):
+0054:         queryset.update(is_blocked=False)
+0055:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
+0056: 
+0057:     unblock_users.short_description = "Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+0058: 
+0059:     def make_managers(self, request, queryset):
+0060:         queryset.update(role="manager")
+0061:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РјРµРЅРµРґР¶РµСЂР°РјРё")
+0062: 
+0063:     make_managers.short_description = "РЎРґРµР»Р°С‚СЊ РјРµРЅРµРґР¶РµСЂР°РјРё"
+0064: 
+0065:     def make_regular_users(self, request, queryset):
+0066:         queryset.update(role="user")
+0067:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё")
+0068: 
+0069:     make_regular_users.short_description = "РЎРґРµР»Р°С‚СЊ РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё"
+0070: 
+0071: 
+0072: admin.site.register(User, UserAdmin)
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\apps.py
+================================================================================
+0001: from django.apps import AppConfig
+0002: 
+0003: 
+0004: class UserConfig(AppConfig):
+0005:     default_auto_field = 'django.db.models.BigAutoField'
+0006:     name = 'user'
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\forms.py
+================================================================================
+0001: from django import forms
+0002: from django.conf import settings
+0003: from django.contrib.auth.forms import PasswordResetForm, UserCreationForm
+0004: from django.core.exceptions import ValidationError
+0005: from django.core.mail import send_mail
+0006: from django.template import loader
+0007: 
+0008: from .models import User
+0009: 
+0010: 
+0011: class UserRegistrationForm(UserCreationForm):
+0012:     email = forms.EmailField(required=True)
+0013: 
+0014:     def clean_email(self):
+0015:         email = self.cleaned_data["email"]
+0016:         if User.objects.filter(email=email).exists():
+0017:             raise ValidationError("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј email СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.")
+0018:         return email
+0019: 
+0020:     def clean_username(self):
+0021:         username = self.cleaned_data["username"]
+0022:         if User.objects.filter(username=username).exists():
+0023:             raise ValidationError("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")
+0024:         return username
+0025: 
+0026:     class Meta:
+0027:         model = User
+0028:         fields = (
+0029:             "username",
+0030:             "email",
+0031:             "country",
+0032:             "phone",
+0033:             "avatar",
+0034:             "password1",
+0035:             "password2",
+0036:         )
+0037: 
+0038: 
+0039: class UserProfileForm(forms.ModelForm):
+0040:     class Meta:
+0041:         model = User
+0042:         fields = ("username", "email", "country", "phone", "avatar")
+0043: 
+0044:     def __init__(self, *args, **kwargs):
+0045:         super().__init__(*args, **kwargs)
+0046:         self.fields["username"].disabled = True  # РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅРµР»СЊР·СЏ РјРµРЅСЏС‚СЊ
+0047:         self.fields["email"].disabled = True  # Email С‚РѕР¶Рµ РЅРµР»СЊР·СЏ РјРµРЅСЏС‚СЊ
+0048: 
+0049: 
+0050: class CustomPasswordResetForm(PasswordResetForm):
+0051:     def send_mail(
+0052:         self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None
+0053:     ):
+0054:         """
+0055:         РљР°СЃС‚РѕРјРЅР°СЏ РѕС‚РїСЂР°РІРєР° РїРёСЃСЊРјР° РґР»СЏ СЃР±СЂРѕСЃР° РїР°СЂРѕР»СЏ
+0056:         """
+0057:         subject = loader.render_to_string(subject_template_name, context)
+0058:         # РЈР±РёСЂР°РµРј РїРµСЂРµРЅРѕСЃС‹ СЃС‚СЂРѕРє РІ subject
+0059:         subject = "".join(subject.splitlines())
+0060:         body = loader.render_to_string(email_template_name, context)
+0061: 
+0062:         send_mail(
+0063:             subject=subject,
+0064:             message=body,
+0065:             from_email=settings.EMAIL_HOST_USER,  # РСЃРїРѕР»СЊР·СѓРµРј email РёР· РЅР°СЃС‚СЂРѕРµРє
+0066:             recipient_list=[to_email],
+0067:             fail_silently=False,
+0068:         )
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\mixins.py
+================================================================================
+0001: from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+0002: from django.core.exceptions import PermissionDenied
+0003: 
+0004: # class ManagerRequiredMixin:
+0005: #     """РўРѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ (role='manager')"""
+0006: #
+0007: #     def dispatch(self, request, *args, **kwargs):
+0008: #         if not request.user.is_authenticated or request.user.role != "manager":
+0009: #             raise PermissionDenied("Р”РѕСЃС‚СѓРї С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ")
+0010: #         return super().dispatch(request, *args, **kwargs)
+0011: 
+0012: 
+0013: class UserAccessMixin:
+0014:     """РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РјРѕР¶РµС‚ СЂР°Р±РѕС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ СЃРѕ СЃРІРѕРёРјРё РѕР±СЉРµРєС‚Р°РјРё"""
+0015: 
+0016:     def get_object(self, queryset=None):
+0017:         # РЇРІРЅРѕ РїРѕР»СѓС‡Р°РµРј РѕР±СЉРµРєС‚
+0018:         obj = super().get_object(queryset) if queryset else super().get_object()
+0019:         return obj
+0020: 
+0021:     def dispatch(self, request, *args, **kwargs):
+0022:         obj = self.get_object()
+0023:         if not request.user.is_authenticated or (obj.owner != request.user and request.user.role != "manager"):
+0024:             raise PermissionDenied("РќРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕРјСѓ РѕР±СЉРµРєС‚Сѓ")
+0025:         return super().dispatch(request, *args, **kwargs)
+0026: 
+0027: 
+0028: class ManagerRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+0029:     """РњРёРєСЃРёРЅ С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ Рё Р°РґРјРёРЅРѕРІ"""
+0030: 
+0031:     def test_func(self):
+0032:         return self.request.user.role == "manager" or self.request.user.is_staff
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\models.py
+================================================================================
+0001: from django.contrib.auth.models import AbstractUser
+0002: from django.core.validators import FileExtensionValidator
+0003: from django.db import models
+0004: from phonenumber_field.modelfields import PhoneNumberField
+0005: 
+0006: 
+0007: class User(AbstractUser):
+0008:     username = models.CharField(
+0009:         max_length=50,
+0010:         unique=True,
+0011:         verbose_name="РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0012:         help_text="Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0013:     )
+0014:     email = models.EmailField(
+0015:         unique=True,
+0016:         blank=False,
+0017:         null=False,
+0018:         verbose_name="email",
+0019:         help_text="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹",
+0020:     )
+0021:     country = models.CharField(
+0022:         max_length=50,
+0023:         blank=True,
+0024:         null=True,
+0025:         verbose_name="РЎС‚СЂР°РЅР°",
+0026:         help_text="Р’РІРµРґРёС‚Рµ СЃС‚СЂР°РЅСѓ",
+0027:     )
+0028: 
+0029:     city = models.CharField(
+0030:         max_length=50,
+0031:         blank=True,
+0032:         null=True,
+0033:         verbose_name="Р“РѕСЂРѕРґ",
+0034:         help_text="Р’РІРµРґРёС‚Рµ РіРѕСЂРѕРґ",
+0035:     )
+0036: 
+0037:     phone = PhoneNumberField(
+0038:         blank=True,
+0039:         null=True,
+0040:         verbose_name="РўРµР»РµС„РѕРЅ",
+0041:         help_text="Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°",
+0042:     )
+0043:     avatar = models.ImageField(
+0044:         upload_to="user/avatars",
+0045:         blank=True,
+0046:         null=True,
+0047:         validators=[FileExtensionValidator(allowed_extensions=["jfif", "jpg", "jpeg", "png"])],
+0048:         verbose_name="РђРІР°С‚Р°СЂ",
+0049:         help_text="Р—Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Р°РІР°С‚Р°СЂР°",
+0050:     )
+0051:     token = models.CharField(max_length=100, verbose_name="РўРѕРєРµРЅ", blank=True, null=True)
+0052:     is_verified = models.BooleanField(default=False, verbose_name="РџРѕРґС‚РІРµСЂР¶РґРµРЅ")
+0053: 
+0054:     USERNAME_FIELD = "email"
+0055:     REQUIRED_FIELDS = [
+0056:         "username",
+0057:     ]
+0058: 
+0059:     ROLES = (("user", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"), ("manager", "РњРµРЅРµРґР¶РµСЂ"), ("moderator", "РњРѕРґРµСЂР°С‚РѕСЂ"))
+0060:     role = models.CharField(max_length=10, choices=ROLES, default="user", verbose_name="Р РѕР»СЊ")
+0061:     is_blocked = models.BooleanField(default=False, verbose_name="Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ")
+0062: 
+0063:     def __str__(self):
+0064:         return self.username
+0065: 
+0066:     class Meta:
+0067:         verbose_name = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
+0068:         verbose_name_plural = "РџРѕР»СЊР·РѕРІР°С‚РµР»Рё"
+0069:         db_table = "user"
+0070:         permissions = [
+0071:             ("block_user", "РњРѕР¶РµС‚ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"),
+0072:             ("disable_mailing", "РњРѕР¶РµС‚ РѕС‚РєР»СЋС‡Р°С‚СЊ СЂР°СЃСЃС‹Р»РєРё"),
+0073:         ]
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\permissions.py
+================================================================================
+0001: from rest_framework import permissions
+0002: 
+0003: 
+0004: class CanEditUserProfile(permissions.BasePermission):
+0005:     """
+0006:     Р Р°Р·СЂРµС€РµРЅРёРµ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РїСЂРѕС„РёР»СЏ:
+0007:     - Р’Р»Р°РґРµР»РµС† РјРѕР¶РµС‚ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ СЃРІРѕР№ РїСЂРѕС„РёР»СЊ
+0008:     - РњРµРЅРµРґР¶РµСЂ РјРѕР¶РµС‚ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ Р»СЋР±РѕР№ РїСЂРѕС„РёР»СЊ
+0009:     - РђРґРјРёРЅ РјРѕР¶РµС‚ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ Р»СЋР±РѕР№ РїСЂРѕС„РёР»СЊ
+0010:     """
+0011: 
+0012:     def has_object_permission(self, request, view, obj):
+0013:         """РќР°СЃС‚СЂРѕР№РєР° РїСЂР°РІ РґРѕСЃС‚СѓРїР° РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РїСЂРѕС„РёР»СЏ"""
+0014:         # Р’Р»Р°РґРµР»РµС† РІСЃРµРіРґР° РјРѕР¶РµС‚ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ
+0015:         if obj == request.user:
+0016:             return True
+0017: 
+0018:         # РџСЂРѕРІРµСЂСЏРµРј РїСЂР°РІР° РјРµРЅРµРґР¶РµСЂР°/Р°РґРјРёРЅР°
+0019:         user_role = getattr(request.user, "role", None)
+0020:         is_manager = user_role == "manager"
+0021:         is_admin = request.user.is_staff
+0022: 
+0023:         return is_manager or is_admin
+0024: 
+0025: 
+0026: class CanViewUserList(permissions.BasePermission):
+0027:     """
+0028:     Р Р°Р·СЂРµС€РµРЅРёРµ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃРїРёСЃРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№:
+0029:     - РўРѕР»СЊРєРѕ РјРµРЅРµРґР¶РµСЂС‹ Рё Р°РґРјРёРЅС‹
+0030:     """
+0031: 
+0032:     def has_permission(self, request, view):
+0033:         """РќР°СЃС‚СЂРѕР№РєР° РїСЂР°РІ РґРѕСЃС‚СѓРїР° РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃРїРёСЃРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"""
+0034:         is_manager = request.user.role == "manager"
+0035:         is_admin = request.user.is_staff
+0036: 
+0037:         return is_manager or is_admin
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\serializers.py
+================================================================================
+0001: from rest_framework import serializers
+0002: 
+0003: from .models import User
+0004: 
+0005: 
+0006: class UserPublicProfileSerializer(serializers.ModelSerializer):
+0007:     """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РїСѓР±Р»РёС‡РЅРѕРіРѕ РїСЂРѕСЃРјРѕС‚СЂР° (РѕРіСЂР°РЅРёС‡РµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ)"""
+0008: 
+0009:     class Meta:
+0010:         model = User
+0011:         fields = ["id", "username", "email", "first_name", "country", "city", "phone", "avatar", "role"]
+0012:         read_only_fields = ["id", "email", "role"]
+0013: 
+0014: 
+0015: class UserPrivateProfileSerializer(serializers.ModelSerializer):
+0016:     """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РїСЂРёРІР°С‚РЅРѕРіРѕ РїСЂРѕСЃРјРѕС‚СЂР° (РІСЃРµ РґР°РЅРЅС‹Рµ)"""
+0017: 
+0018:     class Meta:
+0019:         model = User
+0020:         fields = [
+0021:             "id",
+0022:             "username",
+0023:             "email",
+0024:             "first_name",
+0025:             "last_name",
+0026:             "country",
+0027:             "city",
+0028:             "phone",
+0029:             "avatar",
+0030:             "role",
+0031:             "is_blocked",
+0032:             "payments",
+0033:             "is_verified",
+0034:             "date_joined",
+0035:         ]
+0036:         read_only_fields = ["id", "email", "role", "is_blocked", "is_verified", "date_joined"]
+0037: 
+0038: 
+0039: class UserApiRegistrationSerializer(serializers.ModelSerializer):
+0040:     class Meta:
+0041:         model = User
+0042:         fields = [
+0043:             "username",
+0044:             "email",
+0045:             "password",
+0046:             "first_name",
+0047:             "last_name",
+0048:             "country",
+0049:             "city",
+0050:             "phone",
+0051:             "avatar",
+0052:         ]
+0053: 
+0054:     def validate_username(self, value):
+0055:         """РџСЂРѕРІРµСЂРєР° СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё username"""
+0056:         if User.objects.filter(username=value).exclude(id=self.instance.id if self.instance else None).exists():
+0057:             raise serializers.ValidationError("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.")
+0058:         return value
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\tests.py
+================================================================================
+0001: from django.test import TestCase
+0002: 
+0003: # Create your tests here.
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\urls.py
+================================================================================
+0001: from django.contrib.auth import views as auth_views
+0002: from django.contrib.auth.views import LoginView
+0003: from django.urls import path, reverse_lazy
+0004: from rest_framework.permissions import AllowAny
+0005: from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+0006: 
+0007: from .forms import CustomPasswordResetForm
+0008: from .views import (
+0009:     CustomLogoutView,
+0010:     UserCreateApiView,
+0011:     UserListAPIView,
+0012:     UserListHTMLView,
+0013:     UserListView,
+0014:     UserProfileRetrieveAPIView,
+0015:     UserProfileUpdateAPIView,
+0016:     UserProfileUpdateView,
+0017:     UserRegisterView,
+0018:     email_verification,
+0019:     toggle_user_block
+0020: )
+0021: 
+0022: app_name = "user"
+0023: 
+0024: urlpatterns = [
+0025:     path("login/", LoginView.as_view(template_name="user/login.html"), name="login"),
+0026:     path("logout/", CustomLogoutView.as_view(), name="logout"),
+0027:     path("register/", UserRegisterView.as_view(template_name="user/registration.html"), name="register"),
+0028:     path("profile/edit/", UserProfileUpdateView.as_view(), name="profile_edit"),
+0029:     path("email-confirm/<str:token>/", email_verification, name="email_verification"),
+0030:     path(
+0031:         "password_reset/",
+0032:         auth_views.PasswordResetView.as_view(
+0033:             form_class=CustomPasswordResetForm,
+0034:             template_name="user/password_reset.html",
+0035:             email_template_name="user/password_reset_email.html",
+0036:             subject_template_name="user/password_reset_subject.txt",
+0037:             success_url=reverse_lazy("user:password_reset_done"),
+0038:         ),
+0039:         name="password_reset",
+0040:     ),
+0041:     path(
+0042:         "password_reset/done/",
+0043:         auth_views.PasswordResetDoneView.as_view(
+0044:             template_name="user/password_reset_done.html",
+0045:         ),
+0046:         name="password_reset_done",
+0047:     ),
+0048:     path(
+0049:         "reset/<uidb64>/<token>/",
+0050:         auth_views.PasswordResetConfirmView.as_view(
+0051:             template_name="user/password_reset_confirm.html",
+0052:             success_url=reverse_lazy("user:password_reset_complete"),
+0053:         ),
+0054:         name="password_reset_confirm",
+0055:     ),
+0056:     path(
+0057:         "reset/done/",
+0058:         auth_views.PasswordResetCompleteView.as_view(
+0059:             template_name="user/password_reset_complete.html",
+0060:         ),
+0061:         name="password_reset_complete",
+0062:     ),
+0063:     path("manager/user/", UserListView.as_view(), name="user_list"),
+0064:     path("manager/user/toggle_block/<int:user_id>/", toggle_user_block, name="toggle_user_block"),
+0065:     path("api/user/", UserListAPIView.as_view(), name="api_user_list"),
+0066:     path("api/my-profile/", UserProfileRetrieveAPIView.as_view(), name="api_my_profile"),
+0067:     path("api/my-profile/update/", UserProfileUpdateAPIView.as_view(), name="api_my_profile_update"),
+0068:     path("api/profile/<int:pk>/", UserProfileRetrieveAPIView.as_view(), name="api_profile_detail"),
+0069:     path("api/profile/<int:pk>/update/", UserProfileUpdateAPIView.as_view(), name="api_profile_update_detail"),
+0070:     path("manager/user/html/", UserListHTMLView.as_view(), name="user_list_html"),
+0071:     path("api/login/", TokenObtainPairView.as_view(permission_classes=(AllowAny,)), name="token_obtain_pair"),
+0072:     path("api/token/refresh/", TokenRefreshView.as_view(permission_classes=(AllowAny,)), name="token_refresh"),
+0073:     path("api/register/", UserCreateApiView.as_view(), name="user_api_register"),
+0074: ]
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\views.py
+================================================================================
+0001: import secrets
+0002: 
+0003: from django.conf import settings
+0004: from django.contrib import messages
+0005: from django.contrib.auth import get_user_model, login
+0006: from django.contrib.auth.mixins import LoginRequiredMixin
+0007: from django.contrib.auth.views import LogoutView
+0008: from django.core.exceptions import PermissionDenied
+0009: from django.core.mail import send_mail
+0010: from django.shortcuts import get_object_or_404, redirect
+0011: from django.urls import reverse_lazy
+0012: from django.utils.decorators import method_decorator
+0013: from django.views.decorators.cache import cache_page
+0014: from django.views.generic import CreateView, ListView, TemplateView, UpdateView
+0015: from .mixins import ManagerRequiredMixin
+0016: from rest_framework import generics, permissions, status
+0017: from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
+0018: from rest_framework.filters import OrderingFilter
+0019: from rest_framework.response import Response
+0020: 
+0021: from .forms import UserProfileForm, UserRegistrationForm
+0022: from .models import User
+0023: from .permissions import CanEditUserProfile, CanViewUserList
+0024: from .serializers import (
+0025:     UserApiRegistrationSerializer,
+0026:     UserPrivateProfileSerializer,
+0027:     UserPublicProfileSerializer
+0028: )
+0029: 
+0030: 
+0031: class CustomLogoutView(LogoutView):
+0032:     next_page = reverse_lazy("home")
+0033: 
+0034: 
+0035: class UserRegisterView(CreateView):
+0036:     model = User
+0037:     form_class = UserRegistrationForm
+0038:     template_name = "user/registration.html"
+0039:     success_url = reverse_lazy("home")
+0040: 
+0041:     def form_valid(self, form):
+0042: 
+0043:         user = form.save()
+0044:         user.is_active = False
+0045:         token = secrets.token_hex(16)
+0046:         user.token = token
+0047:         user.save()
+0048:         host = self.request.get_host()
+0049:         url = f"http://{host}/user/email-confirm/{token}/"
+0050:         send_mail(
+0051:             subject="РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РїРѕС‡С‚С‹",
+0052:             message=f"""Р—РґСЂР°РІСЃС‚РІСѓР№С‚Рµ {user.username}.
+0053: РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґС‚РІРµСЂРґРёС‚Рµ Р’Р°С€ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹ РґР»СЏ Р·Р°РІРµСЂС€РµРЅРёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё.
+0054: РґР»СЏ СЌС‚РѕРіРѕ РїРµСЂРµР№РґРёС‚Рµ РїРѕ СЃСЃС‹Р»РєРµ {url}""",
+0055:             from_email=settings.EMAIL_HOST_USER,
+0056:             recipient_list=[user.email],
+0057:         )
+0058:         response = super().form_valid(form)
+0059:         login(self.request, user)
+0060:         messages.success(self.request, "Р РµРіРёСЃС‚СЂР°С†РёСЏ РїСЂРѕС€Р»Р° СѓСЃРїРµС€РЅРѕ!")
+0061:         return response
+0062: 
+0063:     def form_invalid(self, form):
+0064:         messages.error(self.request, "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РёСЃРїСЂР°РІСЊС‚Рµ РѕС€РёР±РєРё РІ С„РѕСЂРјРµ")
+0065:         return super().form_invalid(form)
+0066: 
+0067: 
+0068: class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+0069:     model = User
+0070:     form_class = UserProfileForm
+0071:     template_name = "user/profile_edit.html"
+0072:     success_url = reverse_lazy("user:profile_edit")
+0073: 
+0074:     def get_object(self, queryset=None):
+0075:         return self.request.user  # Р РµРґР°РєС‚РёСЂСѓРµРј С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0076: 
+0077: 
+0078: def email_verification(request, token):
+0079:     user = get_object_or_404(User, token=token)
+0080:     user.is_active = True
+0081:     user.is_verified = True
+0082:     user.token = None
+0083:     user.save()
+0084: 
+0085:     # РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё Р°РІС‚РѕСЂРёР·СѓРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0086:     login(request, user)
+0087: 
+0088:     # Р”РѕР±Р°РІР»СЏРµРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± СѓСЃРїРµС…Рµ
+0089:     messages.success(request, "Р’Р°С€ email СѓСЃРїРµС€РЅРѕ РїРѕРґС‚РІРµСЂР¶РґРµРЅ!")
+0090: 
+0091:     # Р РµРґРёСЂРµРєС‚ РЅР° СЃС‚СЂР°РЅРёС†Сѓ РїСЂРѕС„РёР»СЏ
+0092:     return redirect("user:profile_edit")
+0093: 
+0094: 
+0095: # РЎРїРёСЃРѕРє РІСЃРµС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ (С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ)
+0096: @method_decorator(cache_page(60 * 10), name="dispatch")
+0097: class UserListView(ManagerRequiredMixin, ListView):
+0098:     model = User
+0099:     template_name = "user/user_list.html"
+0100:     context_object_name = "user"
+0101: 
+0102: 
+0103: # Р‘Р»РѕРєРёСЂРѕРІРєР°/СЂР°Р·Р±Р»РѕРєРёСЂРѕРІРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+0104: def toggle_user_block(request, user_id):
+0105:     if request.user.role != "manager":
+0106:         raise PermissionDenied
+0107: 
+0108:     user = get_object_or_404(User, id=user_id)
+0109:     user.is_blocked = not user.is_blocked
+0110:     user.save()
+0111:     messages.success(request, f"РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ {user.email} {'Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ' if user.is_blocked else 'СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅ'}")
+0112:     return redirect("user:user_list")
+0113: 
+0114: class UserListHTMLView(ManagerRequiredMixin, TemplateView):
+0115:     """HTML СЃС‚СЂР°РЅРёС†Р° СЃРїРёСЃРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"""
+0116: 
+0117:     template_name = "user/user_list_api.html"
+0118: 
+0119:     def get_context_data(self, **kwargs):
+0120:         context = super().get_context_data(**kwargs)
+0121:         context["users"] = User.objects.all().order_by("-date_joined")
+0122:         return context
+0123: 
+0124: class UserCreateApiView(generics.CreateAPIView):
+0125:     serializer_class = UserApiRegistrationSerializer
+0126:     queryset = User.objects.all()
+0127:     permission_classes = (permissions.AllowAny,)
+0128: 
+0129:     def perform_create(self, serializer):
+0130:         user = serializer.save(is_active=True)
+0131:         user.set_password(user.password)
+0132:         user.save()
+0133: 
+0134: class UserProfileUpdateAPIView(generics.UpdateAPIView):
+0135:     """
+0136:     Р­РЅРґРїРѕРёРЅС‚ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РїСЂРѕС„РёР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0137:     Р”РѕСЃС‚СѓРї: РІР»Р°РґРµР»РµС†, РјРµРЅРµРґР¶РµСЂ РёР»Рё Р°РґРјРёРЅ
+0138:     """
+0139: 
+0140:     serializer_class = UserPrivateProfileSerializer
+0141:     permission_classes = [permissions.IsAuthenticated, CanEditUserProfile]
+0142: 
+0143:     def get_object(self):
+0144:         """Р’С‹Р·С‹РІР°РµРј РїСЂРѕРІРµСЂРєСѓ РїСЂР°РІ РґР»СЏ РѕР±СЉРµРєС‚Р°"""
+0145:         user_id = self.kwargs.get("pk")
+0146:         if user_id:
+0147:             user = generics.get_object_or_404(User, pk=user_id)
+0148: 
+0149:             # РЇРІРЅРѕ РІС‹Р·С‹РІР°РµРј РїСЂРѕРІРµСЂРєСѓ РїСЂР°РІ РґР»СЏ РѕР±СЉРµРєС‚Р°
+0150:             self.check_object_permissions(self.request, user)
+0151:             return user
+0152:         return self.request.user
+0153: 
+0154:     def check_object_permissions(self, request, obj):
+0155:         """Р’С‹Р·С‹РІР°РµРј РїСЂРѕРІРµСЂРєСѓ РІСЃРµС… permission РєР»Р°СЃСЃРѕРІ РґР»СЏ РѕР±СЉРµРєС‚Р°"""
+0156: 
+0157:         for permission in self.get_permissions():
+0158:             if not permission.has_object_permission(request, self, obj):
+0159:                 from rest_framework.exceptions import PermissionDenied
+0160: 
+0161:                 raise PermissionDenied("РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїСЂР°РІ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ СЌС‚РѕРіРѕ РїСЂРѕС„РёР»СЏ")
+0162: 
+0163: 
+0164: class UserProfileRetrieveAPIView(generics.RetrieveAPIView):
+0165:     """
+0166:     Р­РЅРґРїРѕРёРЅС‚ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° РїСЂРѕС„РёР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0167:     - Р’Р»Р°РґРµР»РµС†: РІСЃРµ РґР°РЅРЅС‹Рµ
+0168:     - РњРµРЅРµРґР¶РµСЂ/РђРґРјРёРЅ: РІСЃРµ РґР°РЅРЅС‹Рµ Р»СЋР±РѕРіРѕ РїСЂРѕС„РёР»СЏ
+0169:     - РћР±С‹С‡РЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ: С‚РѕР»СЊРєРѕ РїСѓР±Р»РёС‡РЅС‹Рµ РґР°РЅРЅС‹Рµ С‡СѓР¶РѕРіРѕ РїСЂРѕС„РёР»СЏ
+0170:     """
+0171: 
+0172:     permission_classes = [permissions.IsAuthenticated]
+0173: 
+0174:     def get_serializer_class(self):
+0175:         target_user = self.get_object()
+0176:         current_user = self.request.user
+0177: 
+0178:         # Р’Р»Р°РґРµР»РµС† РІРёРґРёС‚ РІСЃРµ СЃРІРѕРё РґР°РЅРЅС‹Рµ
+0179:         if target_user == current_user:
+0180:             return UserPrivateProfileSerializer
+0181: 
+0182:         # РњРµРЅРµРґР¶РµСЂ/РђРґРјРёРЅ РІРёРґРёС‚ РІСЃРµ РґР°РЅРЅС‹Рµ Р»СЋР±РѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0183:         is_manager = getattr(current_user, "role", None) == "manager"
+0184:         is_admin = current_user.is_staff
+0185:         if is_manager or is_admin:
+0186:             return UserPrivateProfileSerializer
+0187: 
+0188:         # РћР±С‹С‡РЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РІРёРґРёС‚ С‚РѕР»СЊРєРѕ РїСѓР±Р»РёС‡РЅС‹Рµ РґР°РЅРЅС‹Рµ С‡СѓР¶РѕРіРѕ РїСЂРѕС„РёР»СЏ
+0189:         return UserPublicProfileSerializer
+0190: 
+0191:     def get_object(self):
+0192:         user_id = self.kwargs.get("pk")
+0193:         if user_id:
+0194:             return generics.get_object_or_404(User, pk=user_id)
+0195:         return self.request.user
+0196: 
+0197: 
+0198: class UserListAPIView(generics.ListAPIView):
+0199:     """
+0200:     Р­РЅРґРїРѕРёРЅС‚ РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° СЃРїРёСЃРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+0201:     РўРѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ Рё Р°РґРјРёРЅРѕРІ
+0202:     """
+0203: 
+0204:     serializer_class = UserPrivateProfileSerializer
+0205:     permission_classes = [permissions.IsAuthenticated, CanViewUserList]
+0206: 
+0207:     def get_queryset(self):
+0208:         # РџСЂРѕРІРµСЂСЏРµРј РїСЂР°РІР°
+0209:         if not (self.request.user.role == "manager" or self.request.user.is_staff):
+0210:             raise DRFPermissionDenied("РўРѕР»СЊРєРѕ РјРµРЅРµРґР¶РµСЂС‹ Рё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂС‹ РјРѕРіСѓС‚ РїСЂРѕСЃРјР°С‚СЂРёРІР°С‚СЊ СЃРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№")
+0211: 
+0212:         return User.objects.all().order_by("-date_joined")
+0213: 
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\manage.py
+================================================================================
+0001: #!/usr/bin/env python
+0002: """Django's command-line utility for administrative tasks."""
+0003: import os
+0004: import sys
+0005: 
+0006: 
+0007: def main():
+0008:     """Run administrative tasks."""
+0009:     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+0010:     try:
+0011:         from django.core.management import execute_from_command_line
+0012:     except ImportError as exc:
+0013:         raise ImportError(
+0014:             "Couldn't import Django. Are you sure it's installed and "
+0015:             "available on your PYTHONPATH environment variable? Did you "
+0016:             "forget to activate a virtual environment?"
+0017:         ) from exc
+0018:     execute_from_command_line(sys.argv)
+0019: 
+0020: 
+0021: if __name__ == '__main__':
+0022:     main()
+

@@ -29,7 +29,6 @@ class UserPrivateProfileSerializer(serializers.ModelSerializer):
             "avatar",
             "role",
             "is_blocked",
-            "payments",
             "is_verified",
             "date_joined",
         ]

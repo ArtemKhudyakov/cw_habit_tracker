@@ -1,0 +1,841 @@
+﻿<footer class="bg-dark text-light mt-5 py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>LMS System</h5>
+                <p>Р’Р°С€Р° РїР»Р°С‚С„РѕСЂРјР° РґР»СЏ РѕРЅР»Р°Р№РЅ-РѕР±СѓС‡РµРЅРёСЏ</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <p>&copy; 2025 Learning Management System. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">пёЏ LMS System</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Р“Р»Р°РІРЅР°СЏ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'courses:course-list' %}">РљСѓСЂСЃС‹ (API)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'courses:lessons_list' %}">РЈСЂРѕРєРё (API)</a>
+                </li>
+
+                <!-- РљРЅРѕРїРєРё С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ Рё Р°РґРјРёРЅРѕРІ -->
+                {% if user.is_authenticated and user.role == 'manager' or user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        рџ› пёЏ РЈРїСЂР°РІР»РµРЅРёРµ
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/manager/users/html/">
+                                рџ‘Ґ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/users/">
+                                рџ“Љ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё (API)
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/">
+                                вљ™пёЏ РђРґРјРёРЅРєР°
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        рџ‘¤ {{ user.username }}
+                        {% if user.role == 'manager' or user.is_staff %}
+                        <span class="badge bg-warning">Staff</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/">
+                                рџ“ќ РњРѕР№ РїСЂРѕС„РёР»СЊ (API)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/update/">
+                                вњЏпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїСЂРѕС„РёР»СЊ
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'user:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">рџљЄ Р’С‹Р№С‚Рё</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/login/">Р’РѕР№С‚Рё</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/register/">Р РµРіРёСЃС‚СЂР°С†РёСЏ</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LMS - Learning Management System{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% include "includes/header.html" %}
+    
+    <main class="container mt-4">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}
+        {% endblock %}
+    </main>
+    
+    {% include "includes/footer.html" %}
+    
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
+{% extends "base.html" %}
+{% block title %}Р“Р»Р°РІРЅР°СЏ - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ Learning Management System!</h1>
+        <p class="lead">Р’Р°С€Р° РїР»Р°С‚С„РѕСЂРјР° РґР»СЏ РѕРЅР»Р°Р№РЅ-РѕР±СѓС‡РµРЅРёСЏ</p>
+        <hr class="my-4">
+        <p>РР·СѓС‡Р°Р№С‚Рµ РєСѓСЂСЃС‹, РїСЂРѕС…РѕРґРёС‚Рµ СѓСЂРѕРєРё Рё РѕС‚СЃР»РµР¶РёРІР°Р№С‚Рµ СЃРІРѕР№ РїСЂРѕРіСЂРµСЃСЃ</p>
+        {% if not user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{% url 'user:register' %}" role="button">РќР°С‡Р°С‚СЊ РѕР±СѓС‡РµРЅРёРµ</a>
+        {% else %}
+        <a class="btn btn-success btn-lg" href="{% url 'courses:course-list' %}" role="button">Рљ РєСѓСЂСЃР°Рј (API)</a>
+        <a class="btn btn-info btn-lg ms-2" href="{% url 'courses:lessons_list' %}" role="button">Рљ СѓСЂРѕРєР°Рј (API)</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+<footer class="bg-dark text-light mt-5 py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>LMS System</h5>
+                <p>Р’Р°С€Р° РїР»Р°С‚С„РѕСЂРјР° РґР»СЏ РѕРЅР»Р°Р№РЅ-РѕР±СѓС‡РµРЅРёСЏ</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <p>&copy; 2025 Learning Management System. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/"> LMS System</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Р“Р»Р°РІРЅР°СЏ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/courses/">РљСѓСЂСЃС‹ (API)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/lessons/lessons_list/">РЈСЂРѕРєРё (API)</a>
+                </li>
+
+                <!-- РљРЅРѕРїРєРё С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ Рё Р°РґРјРёРЅРѕРІ -->
+                {% if user.is_authenticated and user.role == 'manager' or user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        рџ› пёЏ РЈРїСЂР°РІР»РµРЅРёРµ
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/manager/users/html/">
+                                рџ‘Ґ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/users/">
+                                рџ“Љ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё (API)
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/">
+                                вљ™пёЏ РђРґРјРёРЅРєР°
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        рџ‘¤ {{ user.username }}
+                        {% if user.role == 'manager' or user.is_staff %}
+                        <span class="badge bg-warning">Staff</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/">
+                                рџ“ќ РњРѕР№ РїСЂРѕС„РёР»СЊ (API)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/update/">
+                                вњЏпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїСЂРѕС„РёР»СЊ
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'user:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">рџљЄ Р’С‹Р№С‚Рё</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/login/">Р’РѕР№С‚Рё</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/register/">Р РµРіРёСЃС‚СЂР°С†РёСЏ</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LMS - Learning Management System{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body>
+    {% include "includes/header.html" %}
+
+    <main class="container mt-4">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include "includes/footer.html" %}
+
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
+{% extends 'user/base.html' %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="bi bi-box-arrow-in-right"></i> Р’С…РѕРґ РІ СЃРёСЃС‚РµРјСѓ
+                    </h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Email</label>
+                            <input type="email" name="username" class="form-control" id="id_username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">РџР°СЂРѕР»СЊ</label>
+                            <input type="password" name="password" class="form-control" id="id_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Р’РѕР№С‚Рё</button>
+                        <div class="text-center">
+                            <a href="{% url 'user:register' %}" class="text-decoration-none">РќРµС‚ Р°РєРєР°СѓРЅС‚Р°?
+                                Р—Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№С‚РµСЃСЊ</a>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'user:password_reset' %}" class="text-decoration-none">Р—Р°Р±С‹Р»Рё РїР°СЂРѕР»СЊ?</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% extends 'user/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">
+                    <i class="bi bi-key"></i> Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїР°СЂРѕР»СЏ
+                </h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" id="id_email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        РћС‚РїСЂР°РІРёС‚СЊ СЃСЃС‹Р»РєСѓ
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'user:login' %}" class="text-decoration-none">
+                            Р’РµСЂРЅСѓС‚СЊСЃСЏ Рє РІС…РѕРґСѓ
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends "user/base.html" %}
+
+{% block content %}
+<p>Р’Р°С€ РїР°СЂРѕР»СЊ СѓСЃРїРµС€РЅРѕ РёР·РјРµРЅРµРЅ!</p>
+<a href="{% url 'user:login' %}">Р’РѕР№С‚Рё СЃ РЅРѕРІС‹Рј РїР°СЂРѕР»РµРј</a>
+{% endblock %}
+{% extends "user/base.html" %}
+
+{% block content %}
+<h2>РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РЅРѕРІС‹Р№ РїР°СЂРѕР»СЊ</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">РЎРѕС…СЂР°РЅРёС‚СЊ РїР°СЂРѕР»СЊ</button>
+</form>
+{% endblock %}
+{% extends "user/base.html" %}
+
+{% block content %}
+<p>РџРёСЃСЊРјРѕ СЃРѕ СЃСЃС‹Р»РєРѕР№ РґР»СЏ СЃР±СЂРѕСЃР° РїР°СЂРѕР»СЏ РѕС‚РїСЂР°РІР»РµРЅРѕ РЅР° РІР°С€ email.</p>
+{% endblock %}
+{% autoescape off %}
+Р—РґСЂР°РІСЃС‚РІСѓР№С‚Рµ!
+
+Р”Р»СЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РїР°СЂРѕР»СЏ РїРµСЂРµР№РґРёС‚Рµ РїРѕ СЃСЃС‹Р»РєРµ:
+{{ protocol }}://{{ domain }}{% url 'user:password_reset_confirm' uidb64=uid token=token %}
+
+Р•СЃР»Рё СЌС‚Рѕ РЅРµ РІС‹, РїСЂРѕРёРіРЅРѕСЂРёСЂСѓР№С‚Рµ СЌС‚Рѕ РїРёСЃСЊРјРѕ.
+{% endautoescape %}
+{% extends 'user/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title mb-4">
+                    <i class="bi bi-person-gear"></i> Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїСЂРѕС„РёР»СЏ
+                </h2>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <label for="id_avatar" class="d-block mb-3">
+                                <img id="avatar-preview"
+                                     src="{% if form.instance.avatar %}{{ form.instance.avatar.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}"
+                                     class="img-thumbnail rounded-circle avatar-preview">
+                                <div class="mt-2">
+                                    <span class="badge bg-primary">РР·РјРµРЅРёС‚СЊ С„РѕС‚Рѕ</span>
+                                </div>
+                            </label>
+                            {{ form.avatar }}
+                        </div>
+
+                        <div class="col-md-8">
+                            {% for field in form %}
+                                {% if field.name != 'avatar' %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ field.errors|first }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                                <button type="submit" class="btn btn-primary">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // РћР±СЂР°Р±РѕС‚РєР° РїСЂРµРІСЊСЋ Р°РІР°С‚Р°СЂР°
+    const avatarInput = document.getElementById('id_avatar');
+    const avatarPreview = document.getElementById('avatar-preview');
+
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('Р¤Р°Р№Р» СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕР№. РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ 5MB.');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Р’Р°Р»РёРґР°С†РёСЏ С„РѕСЂРј Bootstrap
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїСЂРѕС„РёР»СЏ - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        вњЏпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїСЂРѕС„РёР»СЏ
+                        {% if user_obj != request.user %}
+                        РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ {{ user_obj.username }}
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="profile-form">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ</label>
+                                <input type="text" class="form-control" name="username"
+                                       value="{{ user_obj.username }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user_obj.email }}"
+                                       disabled title="Email РЅРµР»СЊР·СЏ РёР·РјРµРЅРёС‚СЊ">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">РРјСЏ</label>
+                                <input type="text" class="form-control" name="first_name"
+                                       value="{{ user_obj.first_name }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Р¤Р°РјРёР»РёСЏ</label>
+                                <input type="text" class="form-control" name="last_name"
+                                       value="{{ user_obj.last_name }}">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">РЎС‚СЂР°РЅР°</label>
+                                <input type="text" class="form-control" name="country"
+                                       value="{{ user_obj.country }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Р“РѕСЂРѕРґ</label>
+                                <input type="text" class="form-control" name="city"
+                                       value="{{ user_obj.city }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">РўРµР»РµС„РѕРЅ</label>
+                            <input type="tel" class="form-control" name="phone"
+                                   value="{{ user_obj.phone }}">
+                        </div>
+
+                        {% if request.user.role == 'manager' or request.user.is_staff %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Р РѕР»СЊ</label>
+                                <select class="form-select" name="role"
+                                        {% if user_obj == request.user %}disabled{% endif %}>
+                                    <option value="user" {% if user_obj.role == 'user' %}selected{% endif %}>
+                                        РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ
+                                    </option>
+                                    <option value="manager" {% if user_obj.role == 'manager' %}selected{% endif %}>
+                                        РњРµРЅРµРґР¶РµСЂ
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">РЎС‚Р°С‚СѓСЃ</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" name="is_blocked"
+                                           {% if user_obj.is_blocked %}checked{% endif %}
+                                           {% if user_obj == request.user %}disabled{% endif %}>
+                                    <label class="form-check-label">
+                                        {% if user_obj.is_blocked %}Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ{% else %}РђРєС‚РёРІРµРЅ{% endif %}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">РЎРѕС…СЂР°РЅРёС‚СЊ</button>
+                            <a href="{% if user_obj != request.user %}{% url 'user:user_list_html' %}{% else %}/{% endif %}"
+                               class="btn btn-secondary">РћС‚РјРµРЅР°</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// JavaScript РґР»СЏ РѕС‚РїСЂР°РІРєРё С„РѕСЂРјС‹ С‡РµСЂРµР· API
+document.getElementById('profile-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch('{% if user_obj != request.user %}/users/api/profile/{{ user_obj.id }}/update/{% else %}/users/api/profile/update/{% endif %}', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            alert('РџСЂРѕС„РёР»СЊ СѓСЃРїРµС€РЅРѕ РѕР±РЅРѕРІР»РµРЅ!');
+            window.location.reload();
+        } else {
+            alert('РћС€РёР±РєР° РїСЂРё РѕР±РЅРѕРІР»РµРЅРёРё РїСЂРѕС„РёР»СЏ');
+        }
+    } catch (error) {
+        alert('РћС€РёР±РєР° СЃРµС‚Рё');
+    }
+});
+</script>
+{% endblock %}
+{% extends "user/base.html" %}
+{% block title %}Р РµРіРёСЃС‚СЂР°С†РёСЏ - LMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Р РµРіРёСЃС‚СЂР°С†РёСЏ РІ Learning Management System</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <div class="text-danger">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                        <div class="form-text">Р”Р»СЏ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ СЂРµРіРёСЃС‚СЂР°С†РёРё</div>
+                        {% if form.email.errors %}
+                        <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password1.id_for_label }}" class="form-label">РџР°СЂРѕР»СЊ</label>
+                            {{ form.password1 }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.password2.id_for_label }}" class="form-label">РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ</label>
+                            {{ form.password2 }}
+                        </div>
+                    </div>
+
+                    {% if form.password1.errors or form.password2.errors %}
+                    <div class="text-danger mb-3">
+                        {{ form.password1.errors }}
+                        {{ form.password2.errors }}
+                    </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-primary w-100">Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊСЃСЏ</button>
+                </form>
+
+                <div class="mt-3 text-center">
+                    <p>РЈР¶Рµ РµСЃС‚СЊ Р°РєРєР°СѓРЅС‚? <a href="{% url 'user:login' %}">Р’РѕР№РґРёС‚Рµ</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends 'mailing/base.html' %}
+
+{% block title %}РЈРїСЂР°РІР»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="bi bi-shield-lock"></i> РЈРїСЂР°РІР»РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё
+    </h1>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ</th>
+                        <th>Email</th>
+                        <th>Р РѕР»СЊ</th>
+                        <th>РЎС‚Р°С‚СѓСЃ</th>
+                        <th>Р”РµР№СЃС‚РІРёСЏ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" width="30" height="30" class="rounded-circle me-2">
+                            {% endif %}
+                            {{ user.username }}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <span class="badge {% if user.role == 'manager' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                {{ user.get_role_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if user.is_blocked %}
+                                <span class="badge bg-danger">Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ</span>
+                            {% else %}
+                                <span class="badge bg-success">РђРєС‚РёРІРµРЅ</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'user:toggle_user_block' user.id %}"
+                               class="btn btn-sm {% if user.is_blocked %}btn-success{% else %}btn-danger{% endif %}">
+                                <i class="bi bi-{% if user.is_blocked %}unlock{% else %}lock{% endif %}"></i>
+                                {% if user.is_blocked %}Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ{% else %}Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">РќРµС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">РќР°Р·Р°Рґ</a>
+                </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Р’РїРµСЂРµРґ</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}РџРѕР»СЊР·РѕРІР°С‚РµР»Рё - LMS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№</h1>
+        <a href="{% url 'home' %}" class="btn btn-secondary">РќР° РіР»Р°РІРЅСѓСЋ</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ</th>
+                    <th>Email</th>
+                    <th>РРјСЏ</th>
+                    <th>Р РѕР»СЊ</th>
+                    <th>РЎС‚Р°С‚СѓСЃ</th>
+                    <th>Р”Р°С‚Р° СЂРµРіРёСЃС‚СЂР°С†РёРё</th>
+                    <th>Р”РµР№СЃС‚РІРёСЏ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>
+                        <strong>{{ user.username }}</strong>
+                        {% if user == request.user %}<span class="badge bg-info">Р’С‹</span>{% endif %}
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.first_name or user.last_name %}
+                            {{ user.first_name }} {{ user.last_name }}
+                        {% else %}
+                            <span class="text-muted">РќРµ СѓРєР°Р·Р°РЅРѕ</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if user.role == 'manager' %}bg-warning{% else %}bg-secondary{% endif %}">
+                            {{ user.get_role_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge {% if user.is_blocked %}bg-danger{% else %}bg-success{% endif %}">
+                            {% if user.is_blocked %}Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ{% else %}РђРєС‚РёРІРµРЅ{% endif %}
+                        </span>
+                    </td>
+                    <td>{{ user.date_joined|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        <a href="{% url 'user:api_profile_detail' pk=user.id %}"
+                           class="btn btn-sm btn-info" title="РџСЂРѕСЃРјРѕС‚СЂ">
+                            рџ‘ЃпёЏ
+                        </a>
+                        <a href="{% url 'user:api_profile_update_detail' pk=user.id %}"
+                           class="btn btn-sm btn-warning" title="Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ">
+                            вњЏпёЏ
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">
+                        РџРѕР»СЊР·РѕРІР°С‚РµР»Рё РЅРµ РЅР°Р№РґРµРЅС‹
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
