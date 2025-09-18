@@ -1,0 +1,89 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/"> LMS System</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/courses/">Курсы (API)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/lessons/lessons_list/">Уроки (API)</a>
+                </li>
+
+                <!-- Кнопки только для менеджеров и админов -->
+                {% if user.is_authenticated and user.role == 'manager' or user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        🛠️ Управление
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/manager/users/html/">
+                                👥 Пользователи
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/users/">
+                                📊 Пользователи (API)
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/">
+                                ⚙️ Админка
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        👤 {{ user.username }}
+                        {% if user.role == 'manager' or user.is_staff %}
+                        <span class="badge bg-warning">Staff</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/">
+                                📝 Мой профиль (API)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/users/api/profile/update/">
+                                ✏️ Редактировать профиль
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'user:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">🚪 Выйти</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/login/">Войти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/register/">Регистрация</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

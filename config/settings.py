@@ -147,11 +147,11 @@ MEDIA_URL = "media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "user.User"
 
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
-LOGIN_URL = "users:login"
+LOGIN_URL = "user:login"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST")
