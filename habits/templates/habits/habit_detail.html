@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Привычка {{ habit.action }} - Трекер Привычек{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            {% if habit.is_pleasant %}🎁{% else %}🎯{% endif %}
+            Детали привычки
+        </h1>
+        <div>
+            <a href="{% url 'habits:api-habit-detail' habit.pk %}" class="btn btn-outline-info btn-sm">API</a>
+            <a href="{% url 'habits:html-habit-list' %}" class="btn btn-secondary btn-sm">← Назад к списку</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+            <h4 class="card-title mb-0">{{ habit.action }}</h4>
+            {% if habit.user.username != request.user.username %}
+            <small class="text-muted">👤 Привычка пользователя: {{ habit.user.username }}</small>
+            {% endif %}
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>📋 Основная информация</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr><th>⏰ Время выполнения:</th><td>{{ habit.time }}</td></tr>
+                            <tr><th>📍 Место выполнения:</th><td>{{ habit.place }}</td></tr>
+                            <tr><th>🔄 Периодичность:</th><td>раз в {{ habit.frequency }} дней</td></tr>
+                            <tr><th>⏱️ Длительность:</th><td>{{ habit.duration }} секунд</td></tr>
+                            <tr><th>🏷️ Тип привычки:</th>
+                                <td>
+                                    {% if habit.is_pleasant %}
+                                    <span class="badge bg-warning">Приятная привычка</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">Полезная привычка</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th>🌍 Видимость:</th>
+                                <td>
+                                    {% if habit.is_public %}
+                                    <span class="badge bg-success">Публичная</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Приватная</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>📅 Даты</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr><th>📅 Создана:</th><td>{{ habit.created_at|date:"d.m.Y H:i" }}</td></tr>
+                            <tr><th>✏️ Обновлена:</th><td>{{ habit.updated_at|date:"d.m.Y H:i" }}</td></tr>
+                        </table>
+                    </div>
+
+                    {% if not habit.is_pleasant %}
+                    <h5 class="mt-4">🎁 Система вознаграждений</h5>
+                    <div class="alert {% if habit.reward %}alert-info{% else %}alert-success{% endif %}">
+                        {% if habit.reward %}
+                        <strong>Вознаграждение:</strong>
+                        <span class="fs-5">{{ habit.reward }}</span>
+
+                        {% elif habit.related_habit %}
+                        <strong>Связанная привычка:</strong><br>
+                        <div class="mt-2 p-3 bg-light rounded">
+                            <h6>🎁 {{ habit.related_habit.action }}</h6>
+                            <p class="mb-2">
+                                <small>⏰ {{ habit.related_habit.time }}</small><br>
+                                <small>📍 {{ habit.related_habit.place }}</small><br>
+                                <small>⏱️ {{ habit.related_habit.duration }} секунд</small>
+                            </p>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}"
+                               class="btn btn-sm btn-outline-primary">
+                                📋 Посмотреть детали
+                            </a>
+                        </div>
+
+                        {% else %}
+                        <strong>Для этой привычки не настроено вознаграждение</strong>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" disabled>✏️ Редактировать</button>
+                    <button class="btn btn-outline-danger" disabled>🗑️ Удалить</button>
+                </div>
+                <div>
+                    <a href="{% url 'habits:html-habit-list' %}" class="btn btn-outline-secondary">
+                        ← Назад к списку
+                    </a>
+                    {% if habit.user == request.user %}
+                    <span class="badge bg-info ms-2">Ваша привычка</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

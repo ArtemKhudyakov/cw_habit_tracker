@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Публичные привычки - Трекер Привычек{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🌍 Публичные привычки</h1>
+        <a href="{% url 'habits:api-public-habits' %}" class="btn btn-outline-info btn-sm">API</a>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">🔍 Фильтры</h6>
+                    <div class="btn-group" role="group">
+                        <a href="?type=all" class="btn btn-outline-primary {% if not request.GET.type or request.GET.type == 'all' %}active{% endif %}">Все</a>
+                        <a href="?type=useful" class="btn btn-outline-success {% if request.GET.type == 'useful' %}active{% endif %}">Полезные</a>
+                        <a href="?type=pleasant" class="btn btn-outline-warning {% if request.GET.type == 'pleasant' %}active{% endif %}">Приятные</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if habits %}
+    <div class="row">
+        {% for habit in habits %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 {% if habit.is_pleasant %}border-warning{% else %}border-primary{% endif %}">
+                <!-- Заголовок карточки - кликабельный -->
+                <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="text-decoration-none">
+                    <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+                        <h5 class="card-title mb-0">
+                            {% if habit.is_pleasant %}🎁{% else %}🎯{% endif %}
+                            {{ habit.action }}
+                        </h5>
+                        <small class="text-muted">👤 {{ habit.user.username }}</small>
+                    </div>
+                </a>
+
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>⏰ Время:</strong> {{ habit.time }}<br>
+                        <strong>📍 Место:</strong> {{ habit.place }}<br>
+                        <strong>🔄 Периодичность:</strong> раз в {{ habit.frequency }} дней<br>
+                        <strong>⏱️ Длительность:</strong> {{ habit.duration }} секунд
+                    </p>
+
+                    {% if not habit.is_pleasant %}
+                        {% if habit.reward %}
+                        <div class="alert alert-info mt-3">
+                            <strong>🎁 Вознаграждение:</strong> {{ habit.reward }}
+                        </div>
+                        {% elif habit.related_habit %}
+                        <div class="alert alert-success mt-3">
+                            <strong>🔗 Связанная привычка:</strong>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}" class="text-decoration-none">
+                                {{ habit.related_habit.action }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="btn btn-sm btn-info">
+                            📋 Детали
+                        </a>
+                        <small class="text-muted">Создана: {{ habit.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h4>🤷‍♂️ Публичных привычек пока нет</h4>
+        <p class="text-muted">Будьте первым, кто поделится своей полезной привычкой!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
