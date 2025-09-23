@@ -1,14 +1,20 @@
 from rest_framework import generics, permissions
-from rest_framework.exceptions import PermissionDenied
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Habit
 from .serializers import HabitSerializer, PublicHabitSerializer
 from .permissions import IsOwner
 from django.http import Http404
+from django.views.generic import TemplateView
+from django.http import JsonResponse
+from django.views import View
+from .tasks import send_test_notification
+from django.shortcuts import redirect
+from django.contrib import messages
+import json
 
 
 # API Views
@@ -107,3 +113,69 @@ class HabitDetailView(LoginRequiredMixin, DetailView):
             return queryset.get(pk=pk)
         except Habit.DoesNotExist:
             raise Http404("Привычка не найдена или у вас нет доступа к ней")
+
+# HTML страницы уведомлений
+class NotificationsView(LoginRequiredMixin, TemplateView):
+    """Страница управления уведомлениями"""
+    template_name = 'habits/notifications.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['habits'] = self.request.user.habits.all()
+        return context
+
+
+class SendTestNotificationView(LoginRequiredMixin, View):
+    """Отправка тестового уведомления (простая версия для форм)"""
+
+    def post(self, request):
+        from .tasks import send_test_notification
+
+        if not request.user.telegram_chat_id:
+            messages.error(request, '❌ Telegram аккаунт не привязан')
+            return redirect('habits:notifications')
+
+        try:
+            result = send_test_notification.delay()
+            messages.success(request, f'✅ {result.result}')
+        except Exception as e:
+            messages.error(request, f'❌ Ошибка: {str(e)}')
+
+        return redirect('habits:notifications')
+
+
+class TestHabitReminderView(LoginRequiredMixin, View):
+    def post(self, request):
+        from .tasks import send_habit_reminder_task
+
+        if not request.user.telegram_chat_id:
+            messages.error(request, '❌ Telegram аккаунт не привязан')
+            return redirect('habits:notifications')
+
+        user_habits = request.user.habits.all()
+        if not user_habits.exists():
+            messages.error(request, '❌ У вас нет привычек для тестирования')
+            return redirect('habits:notifications')
+
+        try:
+            habit = user_habits.first()
+            result = send_habit_reminder_task.delay(habit.id)
+            messages.success(request, f'✅ Напоминание отправлено для: {habit.action}')
+        except Exception as e:
+            messages.error(request, f'❌ Ошибка: {str(e)}')
+
+        return redirect('habits:notifications')
+
+
+class ToggleNotificationsView(LoginRequiredMixin, View):
+    """Включение/выключение уведомлений"""
+
+    def post(self, request):
+        user = request.user
+        user.telegram_notifications = not user.telegram_notifications
+        user.save()
+
+        status = "включены" if user.telegram_notifications else "выключены"
+        messages.success(request, f"🔔 Уведомления {status}")
+
+        return redirect('habits:notifications')

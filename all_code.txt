@@ -19,6 +19,28 @@
 0016: application = get_asgi_application()
 
 ================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\config\celery.py
+================================================================================
+0001: import os
+0002: from celery import Celery
+0003: 
+0004: # РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј РЅР°СЃС‚СЂРѕР№РєРё Django РґР»СЏ Celery
+0005: os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+0006: 
+0007: app = Celery('config')
+0008: 
+0009: # РСЃРїРѕР»СЊР·СѓРµРј РєРѕРЅС„РёРі РёР· settings.py
+0010: app.config_from_object('django.conf:settings', namespace='CELERY')
+0011: 
+0012: # РђРІС‚РѕРїРѕРёСЃРє Р·Р°РґР°С‡ РІРѕ РІСЃРµС… РїСЂРёР»РѕР¶РµРЅРёСЏС…
+0013: app.autodiscover_tasks()
+0014: 
+0015: # РџСЂРѕСЃС‚Р°СЏ Р·Р°РґР°С‡Р° РґР»СЏ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ
+0016: @app.task(bind=True)
+0017: def debug_task(self):
+0018:     return f'Request: {self.request.id}'
+
+================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\config\settings.py
 ================================================================================
 0001: import os
@@ -138,86 +160,99 @@
 0115:     "DEFAULT_PERMISSION_CLASSES": [
 0116:         "rest_framework.permissions.IsAuthenticated",
 0117:     ],
-0118: }
-0119: 
-0120: # Internationalization
-0121: # https://docs.djangoproject.com/en/5.2/topics/i18n/
-0122: 
-0123: LANGUAGE_CODE = "en-us"
-0124: 
-0125: USE_I18N = True
-0126: 
-0127: USE_TZ = True
-0128: 
-0129: TIME_ZONE = "Europe/Moscow"
-0130: 
-0131: # Static files (CSS, JavaScript, Images)
-0132: # https://docs.djangoproject.com/en/5.2/howto/static-files/
-0133: 
-0134: STATIC_URL = "static/"
-0135: STATICFILES_DIRS = (BASE_DIR / "static",)
-0136: STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-0137: STATIC_ROOT = BASE_DIR / "staticfiles"
-0138: 
-0139: # Default primary key field type
-0140: # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-0141: 
-0142: DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-0143: 
-0144: DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-0145: 
-0146: MEDIA_URL = "media/"
-0147: 
-0148: MEDIA_ROOT = BASE_DIR / "media"
-0149: 
-0150: AUTH_USER_MODEL = "user.User"
-0151: 
-0152: LOGIN_REDIRECT_URL = "home"
-0153: LOGOUT_REDIRECT_URL = "home"
-0154: LOGIN_URL = "user:login"
-0155: 
-0156: EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-0157: EMAIL_HOST = os.getenv("EMAIL_HOST")
-0158: EMAIL_PORT = os.getenv("EMAIL_PORT")
-0159: EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-0160: EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-0161: EMAIL_USE_TLS = False
-0162: EMAIL_USE_SSL = True
-0163: DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")  # Р’Р°С€ yandex email
-0164: SERVER_EMAIL = os.getenv("EMAIL_HOST_USER")  # Р”Р»СЏ РѕС€РёР±РѕРє
-0165: 
-0166: CACHES = {
-0167:     "default": {
-0168:         "BACKEND": "django_redis.cache.RedisCache",
-0169:         "LOCATION": "redis://127.0.0.1:6379/2",
-0170:         "OPTIONS": {
-0171:             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-0172:         },
-0173:         "KEY_PREFIX": "mail_service_",
-0174:         "TIMEOUT": 60 * 15,  # 15 РјРёРЅСѓС‚
-0175:     }
-0176: }
-0177: 
-0178: SIMPLE_JWT = {
-0179:     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60 * 2),
-0180:     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-0181: }
+0118:     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+0119:     'PAGE_SIZE': 5, }
+0120: 
+0121: # Internationalization
+0122: # https://docs.djangoproject.com/en/5.2/topics/i18n/
+0123: 
+0124: LANGUAGE_CODE = "en-us"
+0125: 
+0126: USE_I18N = True
+0127: 
+0128: USE_TZ = True
+0129: 
+0130: TIME_ZONE = "Europe/Moscow"
+0131: 
+0132: # Static files (CSS, JavaScript, Images)
+0133: # https://docs.djangoproject.com/en/5.2/howto/static-files/
+0134: 
+0135: STATIC_URL = "static/"
+0136: STATICFILES_DIRS = (BASE_DIR / "static",)
+0137: STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+0138: STATIC_ROOT = BASE_DIR / "staticfiles"
+0139: 
+0140: # Default primary key field type
+0141: # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+0142: 
+0143: DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+0144: 
+0145: DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+0146: 
+0147: MEDIA_URL = "media/"
+0148: 
+0149: MEDIA_ROOT = BASE_DIR / "media"
+0150: 
+0151: AUTH_USER_MODEL = "user.User"
+0152: 
+0153: LOGIN_REDIRECT_URL = "home"
+0154: LOGOUT_REDIRECT_URL = "home"
+0155: LOGIN_URL = "user:login"
+0156: 
+0157: EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+0158: EMAIL_HOST = os.getenv("EMAIL_HOST")
+0159: EMAIL_PORT = os.getenv("EMAIL_PORT")
+0160: EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+0161: EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+0162: EMAIL_USE_TLS = False
+0163: EMAIL_USE_SSL = True
+0164: DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
+0165: SERVER_EMAIL = os.getenv("EMAIL_HOST_USER")
+0166: 
+0167: CACHES = {
+0168:     "default": {
+0169:         "BACKEND": "django_redis.cache.RedisCache",
+0170:         "LOCATION": "redis://127.0.0.1:6379/2",
+0171:         "OPTIONS": {
+0172:             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+0173:         },
+0174:         "KEY_PREFIX": "mail_service_",
+0175:         "TIMEOUT": 60 * 15,  # 15 РјРёРЅСѓС‚
+0176:     }
+0177: }
+0178: 
+0179: SIMPLE_JWT = {
+0180:     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60 * 2),
+0181:     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+0182: }
+0183: 
+0184: CELERY_BROKER_URL = 'redis://localhost:6379/0'
+0185: CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+0186: CELERY_ACCEPT_CONTENT = ['json']
+0187: CELERY_TASK_SERIALIZER = 'json'
+0188: CELERY_RESULT_SERIALIZER = 'json'
+0189: CELERY_TIMEZONE = 'Europe/Moscow'
+0190: 
+0191: CELERY_TASK_ALWAYS_EAGER = True
+0192: CELERY_TASK_EAGER_PROPAGATES = True
+0193: 
+0194: TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\config\urls.py
 ================================================================================
-0001: 
-0002: from django.conf import settings
-0003: from django.conf.urls.static import static
-0004: from django.contrib import admin
-0005: from django.urls import include, path
-0006: from django.views.generic import TemplateView
-0007: 
-0008: urlpatterns = [
-0009:     path('admin/', admin.site.urls),
-0010:     path("", TemplateView.as_view(template_name="home.html"), name="home"),
-0011:     path("user/", include("user.urls", namespace="user"))
-0012: ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+0001: from django.conf import settings
+0002: from django.conf.urls.static import static
+0003: from django.contrib import admin
+0004: from django.urls import include, path
+0005: from django.views.generic import TemplateView
+0006: 
+0007: urlpatterns = [
+0008:                   path('admin/', admin.site.urls),
+0009:                   path("", TemplateView.as_view(template_name="home.html"), name="home"),
+0010:                   path("user/", include("user.urls", namespace="user")),
+0011:                   path("habit_tracker/", include("habits.urls", namespace="habits"))
+0012:               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\config\wsgi.py
@@ -242,6 +277,567 @@
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\config\__init__.py
 ================================================================================
+0001: from .celery import app as celery_app
+0002: 
+0003: __all__ = ('celery_app',)
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\clear_habits.py
+================================================================================
+0001: from django.core.management.base import BaseCommand
+0002: from habits.models import Habit
+0003: 
+0004: class Command(BaseCommand):
+0005:     help = 'РћС‡РёСЃС‚РєР° РІСЃРµС… РїСЂРёРІС‹С‡РµРє РёР· Р±Р°Р·С‹ РґР°РЅРЅС‹С…'
+0006: 
+0007:     def handle(self, *args, **options):
+0008:         count, _ = Habit.objects.all().delete()
+0009:         self.stdout.write(self.style.SUCCESS(f'РЈРґР°Р»РµРЅРѕ {count} РїСЂРёРІС‹С‡РµРє'))
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\debug_notifications.py
+================================================================================
+0001: from django.core.management.base import BaseCommand
+0002: import logging
+0003: from django.conf import settings
+0004: from django.contrib.auth import get_user_model
+0005: import requests
+0006: 
+0007: logger = logging.getLogger(__name__)
+0008: User = get_user_model()
+0009: 
+0010: 
+0011: class Command(BaseCommand):
+0012:     help = 'РџРѕР»РЅР°СЏ РґРёР°РіРЅРѕСЃС‚РёРєР° СЃРёСЃС‚РµРјС‹ СѓРІРµРґРѕРјР»РµРЅРёР№'
+0013: 
+0014:     def handle(self, *args, **options):
+0015:         self.stdout.write('рџ”Ќ РќР°С‡РёРЅР°РµРј РґРёР°РіРЅРѕСЃС‚РёРєСѓ СЃРёСЃС‚РµРјС‹ СѓРІРµРґРѕРјР»РµРЅРёР№...')
+0016: 
+0017:         # РЁР°Рі 1: РџСЂРѕРІРµСЂРєР° РЅР°СЃС‚СЂРѕРµРє
+0018:         self.stdout.write('\n1. рџ”§ РџСЂРѕРІРµСЂРєР° РЅР°СЃС‚СЂРѕРµРє...')
+0019:         if not settings.TELEGRAM_BOT_TOKEN:
+0020:             self.stdout.write(self.style.ERROR('вќЊ TELEGRAM_BOT_TOKEN РЅРµ РЅР°СЃС‚СЂРѕРµРЅ!'))
+0021:             return
+0022:         self.stdout.write(self.style.SUCCESS('вњ… TELEGRAM_BOT_TOKEN РЅР°СЃС‚СЂРѕРµРЅ'))
+0023: 
+0024:         # РЁР°Рі 2: РџСЂРѕРІРµСЂРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№
+0025:         self.stdout.write('\n2. рџ‘Ґ РџСЂРѕРІРµСЂРєР° РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№...')
+0026:         users_with_telegram = User.objects.filter(telegram_chat_id__isnull=False)
+0027:         self.stdout.write(f'РќР°Р№РґРµРЅРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ СЃ Telegram: {users_with_telegram.count()}')
+0028: 
+0029:         for user in users_with_telegram:
+0030:             self.stdout.write(
+0031:                 f'   рџ‘¤ {user.username}: chat_id={user.telegram_chat_id}, notifications={user.telegram_notifications}')
+0032: 
+0033:         if not users_with_telegram.exists():
+0034:             self.stdout.write(self.style.ERROR('вќЊ РќРµС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ СЃ РїСЂРёРІСЏР·Р°РЅРЅС‹Рј Telegram!'))
+0035:             return
+0036: 
+0037:         # РЁР°Рі 3: РџСЂРѕРІРµСЂРєР° Telegram API
+0038:         self.stdout.write('\n3. рџ“Ў РџСЂРѕРІРµСЂРєР° Telegram API...')
+0039:         try:
+0040:             url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/getMe"
+0041:             response = requests.get(url, timeout=10)
+0042:             if response.status_code == 200:
+0043:                 bot_info = response.json()
+0044:                 self.stdout.write(
+0045:                     self.style.SUCCESS(f'вњ… Telegram API СЂР°Р±РѕС‚Р°РµС‚. Р‘РѕС‚: {bot_info["result"]["username"]}'))
+0046:             else:
+0047:                 self.stdout.write(self.style.ERROR(f'вќЊ РћС€РёР±РєР° Telegram API: {response.status_code}'))
+0048:                 return
+0049:         except Exception as e:
+0050:             self.stdout.write(self.style.ERROR(f'вќЊ РћС€РёР±РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє Telegram API: {e}'))
+0051:             return
+0052: 
+0053:         # РЁР°Рі 4: РџСЂРѕР±РЅР°СЏ РѕС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ
+0054:         self.stdout.write('\n4. рџ“Ё РўРµСЃС‚РѕРІР°СЏ РѕС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ...')
+0055:         user = users_with_telegram.first()
+0056: 
+0057:         url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+0058:         payload = {
+0059:             'chat_id': user.telegram_chat_id,
+0060:             'text': 'рџ§Є РўРµСЃС‚РѕРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ РёР· РґРёР°РіРЅРѕСЃС‚РёРєРё',
+0061:             'parse_mode': 'HTML'
+0062:         }
+0063: 
+0064:         try:
+0065:             response = requests.post(url, json=payload, timeout=10)
+0066:             if response.status_code == 200:
+0067:                 self.stdout.write(self.style.SUCCESS('вњ… РЎРѕРѕР±С‰РµРЅРёРµ СѓСЃРїРµС€РЅРѕ РѕС‚РїСЂР°РІР»РµРЅРѕ!'))
+0068:                 self.stdout.write('рџ“± РџСЂРѕРІРµСЂСЊС‚Рµ Telegram, РґРѕР»Р¶РЅРѕ РїСЂРёР№С‚Рё СЃРѕРѕР±С‰РµРЅРёРµ')
+0069:             else:
+0070:                 self.stdout.write(self.style.ERROR(f'вќЊ РћС€РёР±РєР° РѕС‚РїСЂР°РІРєРё: {response.status_code} - {response.text}'))
+0071:         except Exception as e:
+0072:             self.stdout.write(self.style.ERROR(f'вќЊ РћС€РёР±РєР°: {e}'))
+0073: 
+0074:         self.stdout.write('\nрџЋЇ Р”РёР°РіРЅРѕСЃС‚РёРєР° Р·Р°РІРµСЂС€РµРЅР°!')
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\load_public_habits.py
+================================================================================
+0001: import random
+0002: from django.core.management.base import BaseCommand
+0003: from django.contrib.auth import get_user_model
+0004: from habits.models import Habit
+0005: from datetime import time
+0006: 
+0007: User = get_user_model()
+0008: 
+0009: 
+0010: class Command(BaseCommand):
+0011:     help = 'Р—Р°РіСЂСѓР·РєР° РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє РІ Р±Р°Р·Сѓ РґР°РЅРЅС‹С…'
+0012: 
+0013:     def handle(self, *args, **options):
+0014:         # РЎРѕР·РґР°РµРј РёР»Рё РїРѕР»СѓС‡Р°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє
+0015:         user, created = User.objects.get_or_create(
+0016:             username='public_habits_bot',
+0017:             defaults={
+0018:                 'email': 'bot@habittracker.com',
+0019:                 'is_active': True,
+0020:                 'is_verified': True
+0021:             }
+0022:         )
+0023: 
+0024:         if created:
+0025:             user.set_password('botpassword123')
+0026:             user.save()
+0027:             self.stdout.write(self.style.SUCCESS('РЎРѕР·РґР°РЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РґР»СЏ РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє'))
+0028: 
+0029:         # РћС‡РёС‰Р°РµРј СЃС‚Р°СЂС‹Рµ РїСЂРёРІС‹С‡РєРё СЌС‚РѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
+0030:         Habit.objects.filter(user=user).delete()
+0031:         self.stdout.write('РЈРґР°Р»РµРЅС‹ СЃС‚Р°СЂС‹Рµ РїСЂРёРІС‹С‡РєРё Р±РѕС‚Р°')
+0032: 
+0033: 
+0034:         pleasant_habits = []
+0035:         pleasant_data = [
+0036:             {
+0037:                 'action': 'РЎР»СѓС€Р°С‚СЊ Р»СЋР±РёРјСѓСЋ РјСѓР·С‹РєСѓ',
+0038:                 'place': 'Р”РёРІР°РЅ',
+0039:                 'time': time(20, 30),
+0040:                 'frequency': 1,
+0041:                 'duration': 600,
+0042:                 'is_pleasant': True
+0043:             },
+0044:             {
+0045:                 'action': 'РџСЂРёРЅСЏС‚СЊ Р°СЂРѕРјР°С‚РЅСѓСЋ РІР°РЅРЅСѓ',
+0046:                 'place': 'Р’Р°РЅРЅР°СЏ РєРѕРјРЅР°С‚Р°',
+0047:                 'time': time(21, 0),
+0048:                 'frequency': 2,
+0049:                 'duration': 1800,
+0050:                 'is_pleasant': True
+0051:             },
+0052:             {
+0053:                 'action': 'РЎСЉРµСЃС‚СЊ РєСѓСЃРѕС‡РµРє С‚РµРјРЅРѕРіРѕ С€РѕРєРѕР»Р°РґР°',
+0054:                 'place': 'РљСѓС…РЅСЏ',
+0055:                 'time': time(16, 0),
+0056:                 'frequency': 1,
+0057:                 'duration': 60,
+0058:                 'is_pleasant': True
+0059:             },
+0060:             {
+0061:                 'action': 'Р“СѓР»СЏС‚СЊ 30 РјРёРЅСѓС‚ РІ РїР°СЂРєРµ',
+0062:                 'place': 'РџР°СЂРє',
+0063:                 'time': time(18, 30),
+0064:                 'frequency': 1,
+0065:                 'duration': 1800,
+0066:                 'is_pleasant': True
+0067:             }
+0068:         ]
+0069: 
+0070:         for data in pleasant_data:
+0071:             habit = Habit.objects.create(
+0072:                 user=user,
+0073:                 **data,
+0074:                 is_public=True
+0075:             )
+0076:             pleasant_habits.append(habit)
+0077:             self.stdout.write(f'РЎРѕР·РґР°РЅР° РїСЂРёСЏС‚РЅР°СЏ РїСЂРёРІС‹С‡РєР°: {habit.action}')
+0078: 
+0079:         # РўРµРїРµСЂСЊ СЃРѕР·РґР°РµРј РїРѕР»РµР·РЅС‹Рµ РїСЂРёРІС‹С‡РєРё
+0080:         useful_data = [
+0081:             {
+0082:                 'action': 'РџРёС‚СЊ СЃС‚Р°РєР°РЅ РІРѕРґС‹ СѓС‚СЂРѕРј',
+0083:                 'place': 'РљСѓС…РЅСЏ',
+0084:                 'time': time(7, 0),
+0085:                 'frequency': 1,
+0086:                 'duration': 60,
+0087:                 'reward': 'Р§Р°С€РєР° РєРѕС„Рµ'
+0088:             },
+0089:             {
+0090:                 'action': 'Р§РёС‚Р°С‚СЊ 1 СЃС‚СЂР°РЅРёС†Сѓ РєРЅРёРіРё',
+0091:                 'place': 'Р”РёРІР°РЅ',
+0092:                 'time': time(21, 0),
+0093:                 'frequency': 1,
+0094:                 'duration': 120,
+0095:                 'reward': 'РџСЂРѕСЃРјРѕС‚СЂ СЃРµСЂРёР°Р»Р°'
+0096:             },
+0097:             {
+0098:                 'action': 'Р”РµР»Р°С‚СЊ СѓС‚СЂРµРЅРЅСЋСЋ Р·Р°СЂСЏРґРєСѓ',
+0099:                 'place': 'Р“РѕСЃС‚РёРЅР°СЏ',
+0100:                 'time': time(7, 30),
+0101:                 'frequency': 1,
+0102:                 'duration': 120,
+0103:                 'reward': 'РљРѕРЅС‚СЂР°СЃС‚РЅС‹Р№ РґСѓС€'
+0104:             },
+0105:             {
+0106:                 'action': 'Р—Р°РїРёСЃС‹РІР°С‚СЊ 3 РёРґРµРё РІ РґРµРЅСЊ',
+0107:                 'place': 'Р Р°Р±РѕС‡РёР№ СЃС‚РѕР»',
+0108:                 'time': time(19, 0),
+0109:                 'frequency': 1,
+0110:                 'duration': 90,
+0111:                 'reward': 'Р’РµС‡РµСЂРЅСЏСЏ РїСЂРѕРіСѓР»РєР°'
+0112:             },
+0113:             {
+0114:                 'action': 'РњРµРґРёС‚РёСЂРѕРІР°С‚СЊ 2 РјРёРЅСѓС‚С‹',
+0115:                 'place': 'РўРёС…Р°СЏ РєРѕРјРЅР°С‚Р°',
+0116:                 'time': time(8, 0),
+0117:                 'frequency': 1,
+0118:                 'duration': 120,
+0119:                 'reward': 'Р—РґРѕСЂРѕРІС‹Р№ Р·Р°РІС‚СЂР°Рє'
+0120:             },
+0121:             {
+0122:                 'action': 'РџР»Р°РЅРёСЂРѕРІР°С‚СЊ РІРµС‡РµСЂРЅСЋСЋ РїСЂРѕРіСѓР»РєСѓ',
+0123:                 'place': 'Р Р°Р±РѕС‡РёР№ СЃС‚РѕР»',
+0124:                 'time': time(18, 0),
+0125:                 'frequency': 1,
+0126:                 'duration': 60,
+0127:                 'reward': 'РЎРІРµР¶РёР№ РІРѕР·РґСѓС…'
+0128:             },
+0129:             {
+0130:                 'action': 'Р’С‹РїРѕР»РЅСЏС‚СЊ СѓРїСЂР°Р¶РЅРµРЅРёРµ "РџР»Р°РЅРєР°"',
+0131:                 'place': 'Р”РѕРјР°',
+0132:                 'time': time(20, 0),
+0133:                 'frequency': 1,
+0134:                 'duration': 120,
+0135:                 'reward': 'Р Р°СЃС‚СЏР¶РєР°'
+0136:             },
+0137:             {
+0138:                 'action': 'РР·СѓС‡Р°С‚СЊ 5 РЅРѕРІС‹С… РёРЅРѕСЃС‚СЂР°РЅРЅС‹С… СЃР»РѕРІ',
+0139:                 'place': 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ',
+0140:                 'time': time(9, 0),
+0141:                 'frequency': 1,
+0142:                 'duration': 90,
+0143:                 'reward': 'РџРµСЂРµСЂС‹РІ РЅР° С‡Р°Р№'
+0144:             },
+0145:             {
+0146:                 'action': 'РЎРѕСЃС‚Р°РІР»СЏС‚СЊ РїР»Р°РЅ РЅР° РґРµРЅСЊ',
+0147:                 'place': 'Р Р°Р±РѕС‡РёР№ СЃС‚РѕР»',
+0148:                 'time': time(8, 30),
+0149:                 'frequency': 1,
+0150:                 'duration': 60,
+0151:                 'reward': 'РџСЂРѕРґСѓРєС‚РёРІРЅС‹Р№ СЂР°Р±РѕС‡РёР№ РґРµРЅСЊ'
+0152:             },
+0153:             {
+0154:                 'action': 'Р’С‹РїРѕР»РЅСЏС‚СЊ РґС‹С…Р°С‚РµР»СЊРЅС‹Рµ СѓРїСЂР°Р¶РЅРµРЅРёСЏ',
+0155:                 'place': 'РЈРµРґРёРЅРµРЅРЅРѕРµ РјРµСЃС‚Рѕ',
+0156:                 'time': time(12, 0),
+0157:                 'frequency': 1,
+0158:                 'duration': 120,
+0159:                 'reward': 'РЎРІРµР¶РёР№ РІРѕР·РґСѓС…'
+0160:             },
+0161:             {
+0162:                 'action': 'РџСЂРѕРІРµСЂСЏС‚СЊ РѕСЃР°РЅРєСѓ',
+0163:                 'place': 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ',
+0164:                 'time': time(10, 0),
+0165:                 'frequency': 2,
+0166:                 'duration': 30,
+0167:                 'reward': 'РњРёРЅСѓС‚РєР° РѕС‚РґС‹С…Р°'
+0168:             },
+0169:             {
+0170:                 'action': 'РќР°РїРѕР»РЅСЏС‚СЊ Р±СѓС‚С‹Р»РєСѓ РІРѕРґРѕР№',
+0171:                 'place': 'РљСѓС…РЅСЏ',
+0172:                 'time': time(8, 0),
+0173:                 'frequency': 1,
+0174:                 'duration': 60,
+0175:                 'reward': 'Р—РґРѕСЂРѕРІРѕРµ С‚РµР»Рѕ'
+0176:             },
+0177:             {
+0178:                 'action': 'Р’С‹РїРѕР»РЅСЏС‚СЊ СѓРїСЂР°Р¶РЅРµРЅРёСЏ РґР»СЏ РіР»Р°Р·',
+0179:                 'place': 'Р Р°Р±РѕС‡РµРµ РјРµСЃС‚Рѕ',
+0180:                 'time': time(15, 0),
+0181:                 'frequency': 1,
+0182:                 'duration': 120,
+0183:                 'reward': 'РћС‚РґС‹С… РѕС‚ СЌРєСЂР°РЅР°'
+0184:             },
+0185:             {
+0186:                 'action': 'РџР»Р°РЅРёСЂРѕРІР°С‚СЊ Р·РґРѕСЂРѕРІС‹Р№ СѓР¶РёРЅ',
+0187:                 'place': 'РљСѓС…РЅСЏ',
+0188:                 'time': time(19, 30),
+0189:                 'frequency': 1,
+0190:                 'duration': 120,
+0191:                 'reward': 'Р’РєСѓСЃРЅР°СЏ РµРґР°'
+0192:             },
+0193:             {
+0194:                 'action': 'РџРёСЃР°С‚СЊ РІ РґРЅРµРІРЅРёРє Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚Рё',
+0195:                 'place': 'РЎРїР°Р»СЊРЅСЏ',
+0196:                 'time': time(22, 0),
+0197:                 'frequency': 1,
+0198:                 'duration': 120,
+0199:                 'reward': 'РЎРїРѕРєРѕР№РЅС‹Р№ СЃРѕРЅ'
+0200:             }
+0201:         ]
+0202: 
+0203:         created_count = len(pleasant_habits)
+0204: 
+0205:         for data in useful_data:
+0206:             # РЎР»СѓС‡Р°Р№РЅС‹Рј РѕР±СЂР°Р·РѕРј СЂРµС€Р°РµРј, Р±СѓРґРµС‚ Р»Рё Сѓ РїСЂРёРІС‹С‡РєРё СЃРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР° РёР»Рё РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ
+0207:             has_related = random.choice([True, False]) and pleasant_habits
+0208: 
+0209:             habit_data = {
+0210:                 'user': user,
+0211:                 'is_pleasant': False,
+0212:                 'is_public': True,
+0213:                 'related_habit': None,
+0214:                 'reward': None
+0215:             }
+0216:             habit_data.update(data)
+0217: 
+0218:             if has_related:
+0219:                 habit_data['related_habit'] = random.choice(pleasant_habits)
+0220:             else:
+0221:                 habit_data['reward'] = data['reward']
+0222: 
+0223:             habit = Habit.objects.create(**habit_data)
+0224:             created_count += 1
+0225:             self.stdout.write(f'РЎРѕР·РґР°РЅР° РїРѕР»РµР·РЅР°СЏ РїСЂРёРІС‹С‡РєР°: {habit.action}')
+0226: 
+0227:         self.stdout.write(
+0228:             self.style.SUCCESS(
+0229:                 f'РЈСЃРїРµС€РЅРѕ СЃРѕР·РґР°РЅРѕ {created_count} РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє! '
+0230:                 f'РўРµРїРµСЂСЊ РёС… РјРѕР¶РЅРѕ СѓРІРёРґРµС‚СЊ РїРѕ Р°РґСЂРµСЃСѓ: /habit_tracker/html/habits/public/'
+0231:             )
+0232:         )
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\notifications.py
+================================================================================
+0001: from django.core.management.base import BaseCommand
+0002: from habits.tasks import send_test_notification
+0003: from django.contrib.auth import get_user_model
+0004: 
+0005: User = get_user_model()
+0006: 
+0007: 
+0008: class Command(BaseCommand):
+0009:     help = 'Р‘С‹СЃС‚СЂР°СЏ РїСЂРѕРІРµСЂРєР° СѓРІРµРґРѕРјР»РµРЅРёР№'
+0010: 
+0011:     def handle(self, *args, **options):
+0012:         self.stdout.write('рџ”” Testing notifications...')
+0013: 
+0014:         # РџСЂРѕРІРµСЂСЏРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ СЃ Telegram
+0015:         users_with_telegram = User.objects.filter(telegram_chat_id__isnull=False)
+0016:         self.stdout.write(f'Found {users_with_telegram.count()} users with Telegram')
+0017: 
+0018:         for user in users_with_telegram:
+0019:             self.stdout.write(f'Sending test to {user.username}...')
+0020:             result = send_test_notification.delay()
+0021:             self.stdout.write(f'Result: {result.result}')
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\run_bot.py
+================================================================================
+0001: from django.core.management.base import BaseCommand
+0002: from habits.telegram_bot import HabitTrackerBot
+0003: import logging
+0004: import asyncio
+0005: 
+0006: logger = logging.getLogger(__name__)
+0007: 
+0008: 
+0009: class Command(BaseCommand):
+0010:     help = 'Р—Р°РїСѓСЃРє Telegram Р±РѕС‚Р° РґР»СЏ С‚СЂРµРєРµСЂР° РїСЂРёРІС‹С‡РµРє'
+0011: 
+0012:     def handle(self, *args, **options):
+0013:         self.stdout.write('Starting Telegram bot...')
+0014: 
+0015:         try:
+0016:             bot = HabitTrackerBot()
+0017: 
+0018:             # Р—Р°РїСѓСЃРєР°РµРј Р±РѕС‚Р° РІ asyncio event loop
+0019:             loop = asyncio.get_event_loop()
+0020:             if loop.is_running():
+0021:                 # Р•СЃР»Рё loop СѓР¶Рµ Р·Р°РїСѓС‰РµРЅ (РЅР°РїСЂРёРјРµСЂ, РІ Django 4.x+)
+0022:                 loop.create_task(bot.run())
+0023:             else:
+0024:                 # Р”Р»СЏ Django 3.x Рё СЃС‚Р°СЂС‹С… РІРµСЂСЃРёР№
+0025:                 loop.run_until_complete(bot.run())
+0026: 
+0027:         except Exception as e:
+0028:             logger.error(f"Bot error: {e}")
+0029:             self.stdout.write(self.style.ERROR(f'Bot error: {e}'))
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\test_notification.py
+================================================================================
+0001: from django.core.management.base import BaseCommand
+0002: from habits.tasks import send_test_notification, send_habit_reminder
+0003: from habits.models import Habit
+0004: from django.contrib.auth import get_user_model
+0005: 
+0006: User = get_user_model()
+0007: 
+0008: 
+0009: class Command(BaseCommand):
+0010:     help = 'РћС‚РїСЂР°РІРєР° С‚РµСЃС‚РѕРІРѕРіРѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ'
+0011: 
+0012:     def add_arguments(self, parser):
+0013:         parser.add_argument('--habit', type=int, help='Send reminder for specific habit ID')
+0014:         parser.add_argument('--user', type=str, help='Send to specific username')
+0015: 
+0016:     def handle(self, *args, **options):
+0017:         if options['habit']:
+0018:             # РћС‚РїСЂР°РІРєР° РЅР°РїРѕРјРёРЅР°РЅРёСЏ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё
+0019:             habit_id = options['habit']
+0020:             self.stdout.write(f'Sending reminder for habit {habit_id}...')
+0021:             result = send_habit_reminder.delay(habit_id)
+0022:             self.stdout.write(self.style.SUCCESS(f'Result: {result.result}'))
+0023: 
+0024:         elif options['user']:
+0025:             # РћС‚РїСЂР°РІРєР° С‚РµСЃС‚РѕРІРѕРіРѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ РєРѕРЅРєСЂРµС‚РЅРѕРјСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
+0026:             username = options['user']
+0027:             user = User.objects.filter(username=username).first()
+0028:             if user and user.telegram_chat_id:
+0029:                 from habits.tasks import send_telegram_message
+0030:                 message = f"рџ§Є РўРµСЃС‚РѕРІРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ РґР»СЏ {username}"
+0031:                 success = send_telegram_message(user.telegram_chat_id, message)
+0032:                 self.stdout.write(self.style.SUCCESS(f'Notification sent: {success}'))
+0033:             else:
+0034:                 self.stdout.write(self.style.ERROR('User not found or no Telegram chat_id'))
+0035: 
+0036:         else:
+0037:             # РћР±С‹С‡РЅРѕРµ С‚РµСЃС‚РѕРІРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ
+0038:             self.stdout.write('Sending test notification...')
+0039:             result = send_test_notification.delay()
+0040:             self.stdout.write(self.style.SUCCESS(f'Result: {result.result}'))
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\commands\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\management\__init__.py
+================================================================================
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\migrations\0001_initial.py
+================================================================================
+0001: # Generated by Django 5.2.6 on 2025-09-19 18:33
+0002: 
+0003: import django.db.models.deletion
+0004: import habits.validators
+0005: from django.conf import settings
+0006: from django.db import migrations, models
+0007: 
+0008: 
+0009: class Migration(migrations.Migration):
+0010: 
+0011:     initial = True
+0012: 
+0013:     dependencies = [
+0014:         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+0015:     ]
+0016: 
+0017:     operations = [
+0018:         migrations.CreateModel(
+0019:             name="Habit",
+0020:             fields=[
+0021:                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+0022:                 (
+0023:                     "place",
+0024:                     models.CharField(
+0025:                         help_text="РњРµСЃС‚Рѕ, РІ РєРѕС‚РѕСЂРѕРј РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ",
+0026:                         max_length=255,
+0027:                         verbose_name="РњРµСЃС‚Рѕ РІС‹РїРѕР»РЅРµРЅРёСЏ",
+0028:                     ),
+0029:                 ),
+0030:                 (
+0031:                     "time",
+0032:                     models.TimeField(
+0033:                         help_text="Р’СЂРµРјСЏ, РєРѕРіРґР° РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ", verbose_name="Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ"
+0034:                     ),
+0035:                 ),
+0036:                 (
+0037:                     "action",
+0038:                     models.CharField(
+0039:                         help_text="РљРѕРЅРєСЂРµС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ, РєРѕС‚РѕСЂРѕРµ РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ РїСЂРёРІС‹С‡РєР°",
+0040:                         max_length=255,
+0041:                         verbose_name="Р”РµР№СЃС‚РІРёРµ",
+0042:                     ),
+0043:                 ),
+0044:                 (
+0045:                     "is_pleasant",
+0046:                     models.BooleanField(
+0047:                         default=False,
+0048:                         help_text="РЇРІР»СЏРµС‚СЃСЏ Р»Рё РїСЂРёРІС‹С‡РєР° РїСЂРёСЏС‚РЅРѕР№ (РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµРј)",
+0049:                         verbose_name="РџСЂРёР·РЅР°Рє РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё",
+0050:                     ),
+0051:                 ),
+0052:                 (
+0053:                     "reward",
+0054:                     models.CharField(
+0055:                         blank=True,
+0056:                         help_text="Р§РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РґРѕР»Р¶РµРЅ СЃРµР±СЏ РІРѕР·РЅР°РіСЂР°РґРёС‚СЊ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ",
+0057:                         max_length=255,
+0058:                         null=True,
+0059:                         verbose_name="Р’РѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ",
+0060:                     ),
+0061:                 ),
+0062:                 (
+0063:                     "frequency",
+0064:                     models.PositiveIntegerField(
+0065:                         default=1,
+0066:                         help_text="РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРёРІС‹С‡РєРё (СЂР°Р· РІ СЃРєРѕР»СЊРєРѕ РґРЅРµР№)",
+0067:                         validators=[habits.validators.validate_habit_frequency],
+0068:                         verbose_name="РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ (РІ РґРЅСЏС…)",
+0069:                     ),
+0070:                 ),
+0071:                 (
+0072:                     "duration",
+0073:                     models.PositiveIntegerField(
+0074:                         help_text="Р’СЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РїСЂРµРґРїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕ РїРѕС‚СЂР°С‚РёС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРёРІС‹С‡РєРё",
+0075:                         validators=[habits.validators.validate_habit_duration],
+0076:                         verbose_name="Р’СЂРµРјСЏ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ (РІ СЃРµРєСѓРЅРґР°С…)",
+0077:                     ),
+0078:                 ),
+0079:                 (
+0080:                     "is_public",
+0081:                     models.BooleanField(
+0082:                         default=False,
+0083:                         help_text="РњРѕРіСѓС‚ Р»Рё РґСЂСѓРіРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё РІРёРґРµС‚СЊ СЌС‚Сѓ РїСЂРёРІС‹С‡РєСѓ",
+0084:                         verbose_name="РџСЂРёР·РЅР°Рє РїСѓР±Р»РёС‡РЅРѕСЃС‚Рё",
+0085:                     ),
+0086:                 ),
+0087:                 ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ")),
+0088:                 ("updated_at", models.DateTimeField(auto_now=True, verbose_name="Р”Р°С‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ")),
+0089:                 (
+0090:                     "related_habit",
+0091:                     models.ForeignKey(
+0092:                         blank=True,
+0093:                         help_text="РџСЂРёСЏС‚РЅР°СЏ РїСЂРёРІС‹С‡РєР°, РєРѕС‚РѕСЂР°СЏ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕСЃР»Рµ РѕСЃРЅРѕРІРЅРѕР№",
+0094:                         null=True,
+0095:                         on_delete=django.db.models.deletion.SET_NULL,
+0096:                         related_name="related_habits",
+0097:                         to="habits.habit",
+0098:                         verbose_name="РЎРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР°",
+0099:                     ),
+0100:                 ),
+0101:                 (
+0102:                     "user",
+0103:                     models.ForeignKey(
+0104:                         on_delete=django.db.models.deletion.CASCADE,
+0105:                         related_name="habits",
+0106:                         to=settings.AUTH_USER_MODEL,
+0107:                         verbose_name="РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+0108:                     ),
+0109:                 ),
+0110:             ],
+0111:             options={
+0112:                 "verbose_name": "РџСЂРёРІС‹С‡РєР°",
+0113:                 "verbose_name_plural": "РџСЂРёРІС‹С‡РєРё",
+0114:                 "ordering": ["-created_at"],
+0115:             },
+0116:         ),
+0117:     ]
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\migrations\__init__.py
@@ -251,8 +847,15 @@
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\admin.py
 ================================================================================
 0001: from django.contrib import admin
-0002: 
-0003: # Register your models here.
+0002: from .models import Habit
+0003: 
+0004: 
+0005: @admin.register(Habit)
+0006: class HabitAdmin(admin.ModelAdmin):
+0007:     list_display = ('user', 'action', 'time', 'place', 'is_pleasant', 'is_public')
+0008:     list_filter = ('is_pleasant', 'is_public', 'frequency')
+0009:     search_fields = ('action', 'place', 'user__username')
+0010:     readonly_fields = ('created_at', 'updated_at')
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\apps.py
@@ -268,8 +871,515 @@
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\models.py
 ================================================================================
 0001: from django.db import models
+0002: from django.core.validators import MinValueValidator, MaxValueValidator
+0003: from django.conf import settings
+0004: from django.core.exceptions import ValidationError
+0005: from .validators import validate_habit_duration, validate_habit_frequency
+0006: 
+0007: class Habit(models.Model):
+0008:     """РњРѕРґРµР»СЊ РґР»СЏ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёСЏ РїСЂРёРІС‹С‡РµРє РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0009: 
+0010:     # РћСЃРЅРѕРІРЅС‹Рµ РїРѕР»СЏ
+0011:     user = models.ForeignKey(
+0012:         settings.AUTH_USER_MODEL,
+0013:         on_delete=models.CASCADE,
+0014:         related_name='habits',
+0015:         verbose_name="РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
+0016:     )
+0017:     place = models.CharField(
+0018:         max_length=255,
+0019:         verbose_name="РњРµСЃС‚Рѕ РІС‹РїРѕР»РЅРµРЅРёСЏ",
+0020:         help_text="РњРµСЃС‚Рѕ, РІ РєРѕС‚РѕСЂРѕРј РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ"
+0021:     )
+0022:     time = models.TimeField(
+0023:         verbose_name="Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ",
+0024:         help_text="Р’СЂРµРјСЏ, РєРѕРіРґР° РЅРµРѕР±С…РѕРґРёРјРѕ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ"
+0025:     )
+0026:     action = models.CharField(
+0027:         max_length=255,
+0028:         verbose_name="Р”РµР№СЃС‚РІРёРµ",
+0029:         help_text="РљРѕРЅРєСЂРµС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ, РєРѕС‚РѕСЂРѕРµ РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ РїСЂРёРІС‹С‡РєР°"
+0030:     )
+0031: 
+0032:     # РЎРІСЏР·Р°РЅРЅС‹Рµ РїСЂРёРІС‹С‡РєРё Рё РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёСЏ
+0033:     is_pleasant = models.BooleanField(
+0034:         default=False,
+0035:         verbose_name="РџСЂРёР·РЅР°Рє РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё",
+0036:         help_text="РЇРІР»СЏРµС‚СЃСЏ Р»Рё РїСЂРёРІС‹С‡РєР° РїСЂРёСЏС‚РЅРѕР№ (РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµРј)"
+0037:     )
+0038:     related_habit = models.ForeignKey(
+0039:         'self',
+0040:         on_delete=models.SET_NULL,
+0041:         null=True,
+0042:         blank=True,
+0043:         related_name='related_habits',
+0044:         verbose_name="РЎРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР°",
+0045:         help_text="РџСЂРёСЏС‚РЅР°СЏ РїСЂРёРІС‹С‡РєР°, РєРѕС‚РѕСЂР°СЏ РІС‹РїРѕР»РЅСЏРµС‚СЃСЏ РїРѕСЃР»Рµ РѕСЃРЅРѕРІРЅРѕР№"
+0046:     )
+0047:     reward = models.CharField(
+0048:         max_length=255,
+0049:         blank=True,
+0050:         null=True,
+0051:         verbose_name="Р’РѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ",
+0052:         help_text="Р§РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РґРѕР»Р¶РµРЅ СЃРµР±СЏ РІРѕР·РЅР°РіСЂР°РґРёС‚СЊ РїРѕСЃР»Рµ РІС‹РїРѕР»РЅРµРЅРёСЏ"
+0053:     )
+0054: 
+0055:     # РќР°СЃС‚СЂРѕР№РєРё РІС‹РїРѕР»РЅРµРЅРёСЏ
+0056:     frequency = models.PositiveIntegerField(
+0057:         default=1,
+0058:         validators=[validate_habit_frequency],
+0059:         verbose_name="РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ (РІ РґРЅСЏС…)",
+0060:         help_text="РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРёРІС‹С‡РєРё (СЂР°Р· РІ СЃРєРѕР»СЊРєРѕ РґРЅРµР№)"
+0061:     )
+0062:     duration = models.PositiveIntegerField(
+0063:         validators=[validate_habit_duration],
+0064:         verbose_name="Р’СЂРµРјСЏ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ (РІ СЃРµРєСѓРЅРґР°С…)",
+0065:         help_text="Р’СЂРµРјСЏ, РєРѕС‚РѕСЂРѕРµ РїСЂРµРґРїРѕР»РѕР¶РёС‚РµР»СЊРЅРѕ РїРѕС‚СЂР°С‚РёС‚ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРёРІС‹С‡РєРё"
+0066:     )
+0067: 
+0068:     # Р’РёРґРёРјРѕСЃС‚СЊ
+0069:     is_public = models.BooleanField(
+0070:         default=False,
+0071:         verbose_name="РџСЂРёР·РЅР°Рє РїСѓР±Р»РёС‡РЅРѕСЃС‚Рё",
+0072:         help_text="РњРѕРіСѓС‚ Р»Рё РґСЂСѓРіРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё РІРёРґРµС‚СЊ СЌС‚Сѓ РїСЂРёРІС‹С‡РєСѓ"
+0073:     )
+0074: 
+0075:     # Р”Р°С‚С‹ РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ
+0076:     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Р”Р°С‚Р° СЃРѕР·РґР°РЅРёСЏ")
+0077:     updated_at = models.DateTimeField(auto_now=True, verbose_name="Р”Р°С‚Р° РѕР±РЅРѕРІР»РµРЅРёСЏ")
+0078: 
+0079:     class Meta:
+0080:         verbose_name = "РџСЂРёРІС‹С‡РєР°"
+0081:         verbose_name_plural = "РџСЂРёРІС‹С‡РєРё"
+0082:         ordering = ['-created_at']
+0083: 
+0084:     def __str__(self):
+0085:         return f"{self.user.username}: {self.action} РІ {self.time}"
+0086: 
+0087:     def clean(self):
+0088:         """РљР°СЃС‚РѕРјРЅР°СЏ РІР°Р»РёРґР°С†РёСЏ РјРѕРґРµР»Рё"""
+0089:         errors = {}
+0090: 
+0091:         # 1. РСЃРєР»СЋС‡РёС‚СЊ РѕРґРЅРѕРІСЂРµРјРµРЅРЅС‹Р№ РІС‹Р±РѕСЂ СЃРІСЏР·Р°РЅРЅРѕР№ РїСЂРёРІС‹С‡РєРё Рё СѓРєР°Р·Р°РЅРёСЏ РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёСЏ
+0092:         if self.related_habit and self.reward:
+0093:             errors['reward'] = "РќРµР»СЊР·СЏ СѓРєР°Р·С‹РІР°С‚СЊ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ Рё СЃРІСЏР·Р°РЅРЅСѓСЋ РїСЂРёРІС‹С‡РєСѓ, Рё РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ"
+0094:             errors['related_habit'] = "РќРµР»СЊР·СЏ СѓРєР°Р·С‹РІР°С‚СЊ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ Рё СЃРІСЏР·Р°РЅРЅСѓСЋ РїСЂРёРІС‹С‡РєСѓ, Рё РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ"
+0095: 
+0096:         # 2. Р’ СЃРІСЏР·Р°РЅРЅС‹Рµ РїСЂРёРІС‹С‡РєРё РјРѕРіСѓС‚ РїРѕРїР°РґР°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРёРІС‹С‡РєРё СЃ РїСЂРёР·РЅР°РєРѕРј РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё
+0097:         if self.related_habit and not self.related_habit.is_pleasant:
+0098:             errors['related_habit'] = "Р’ СЃРІСЏР·Р°РЅРЅС‹Рµ РїСЂРёРІС‹С‡РєРё РјРѕРіСѓС‚ РїРѕРїР°РґР°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРёСЏС‚РЅС‹Рµ РїСЂРёРІС‹С‡РєРё"
+0099: 
+0100:         # 3. РЈ РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёСЏ РёР»Рё СЃРІСЏР·Р°РЅРЅРѕР№ РїСЂРёРІС‹С‡РєРё
+0101:         if self.is_pleasant:
+0102:             if self.reward:
+0103:                 errors['reward'] = "РЈ РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёСЏ"
+0104:             if self.related_habit:
+0105:                 errors['related_habit'] = "РЈ РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЃРІСЏР·Р°РЅРЅРѕР№ РїСЂРёРІС‹С‡РєРё"
+0106:         else:
+0107:             # 4. Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РїРѕР»РµР·РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ Р±РѕР»СЊС€Рµ 120 СЃРµРєСѓРЅРґ
+0108:             if self.duration > 120:
+0109:                 errors['duration'] = "Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РїРѕР»РµР·РЅРѕР№ РїСЂРёРІС‹С‡РєРё РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅРµ Р±РѕР»СЊС€Рµ 120 СЃРµРєСѓРЅРґ"
+0110: 
+0111:         # 5. РќРµР»СЊР·СЏ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ СЂРµР¶Рµ, С‡РµРј 1 СЂР°Р· РІ 7 РґРЅРµР№
+0112:         if self.frequency > 7:
+0113:             errors['frequency'] = "РќРµР»СЊР·СЏ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ СЂРµР¶Рµ, С‡РµРј 1 СЂР°Р· РІ 7 РґРЅРµР№"
+0114: 
+0115:         if errors:
+0116:             raise ValidationError(errors)
+0117: 
+0118:     def save(self, *args, **kwargs):
+0119:         """РџРµСЂРµРѕРїСЂРµРґРµР»СЏРµРј save РґР»СЏ РІС‹Р·РѕРІР° РїРѕР»РЅРѕР№ РІР°Р»РёРґР°С†РёРё"""
+0120:         self.full_clean()
+0121:         super().save(*args, **kwargs)
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\permissions.py
+================================================================================
+0001: from rest_framework import permissions
 0002: 
-0003: # Create your models here.
+0003: 
+0004: class IsOwner(permissions.BasePermission):
+0005:     """
+0006:     Р Р°Р·СЂРµС€РµРЅРёРµ, РїРѕР·РІРѕР»СЏСЋС‰РµРµ СЂР°Р±РѕС‚Р°С‚СЊ С‚РѕР»СЊРєРѕ СЃРѕ СЃРІРѕРёРјРё РїСЂРёРІС‹С‡РєР°РјРё
+0007:     """
+0008: 
+0009:     def has_object_permission(self, request, view, obj):
+0010:         # Р Р°Р·СЂРµС€Р°РµРј РґРѕСЃС‚СѓРї С‚РѕР»СЊРєРѕ РµСЃР»Рё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЏРІР»СЏРµС‚СЃСЏ РІР»Р°РґРµР»СЊС†РµРј РїСЂРёРІС‹С‡РєРё
+0011:         return obj.user == request.user
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\serializers.py
+================================================================================
+0001: from rest_framework import serializers
+0002: from .models import Habit
+0003: from django.core.exceptions import ValidationError
+0004: 
+0005: 
+0006: class HabitSerializer(serializers.ModelSerializer):
+0007:     """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РїСЂРёРІС‹С‡РµРє"""
+0008: 
+0009:     class Meta:
+0010:         model = Habit
+0011:         fields = [
+0012:             'id', 'user', 'place', 'time', 'action', 'is_pleasant',
+0013:             'related_habit', 'reward', 'frequency', 'duration',
+0014:             'is_public', 'created_at', 'updated_at'
+0015:         ]
+0016:         read_only_fields = ['user', 'created_at', 'updated_at']
+0017: 
+0018:     def validate(self, data):
+0019:         """Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅР°СЏ РІР°Р»РёРґР°С†РёСЏ РЅР° СѓСЂРѕРІРЅРµ СЃРµСЂРёР°Р»РёР·Р°С‚РѕСЂР°"""
+0020:         # РџСЂРѕРІРµСЂСЏРµРј С‚Рµ Р¶Рµ СѓСЃР»РѕРІРёСЏ, С‡С‚Рѕ Рё РІ РјРѕРґРµР»Рё
+0021:         related_habit = data.get('related_habit')
+0022:         reward = data.get('reward')
+0023:         is_pleasant = data.get('is_pleasant', self.instance.is_pleasant if self.instance else False)
+0024: 
+0025:         if related_habit and reward:
+0026:             raise serializers.ValidationError(
+0027:                 "РќРµР»СЊР·СЏ СѓРєР°Р·С‹РІР°С‚СЊ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ Рё СЃРІСЏР·Р°РЅРЅСѓСЋ РїСЂРёРІС‹С‡РєСѓ, Рё РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ"
+0028:             )
+0029: 
+0030:         if related_habit and not related_habit.is_pleasant:
+0031:             raise serializers.ValidationError(
+0032:                 "Р’ СЃРІСЏР·Р°РЅРЅС‹Рµ РїСЂРёРІС‹С‡РєРё РјРѕРіСѓС‚ РїРѕРїР°РґР°С‚СЊ С‚РѕР»СЊРєРѕ РїСЂРёСЏС‚РЅС‹Рµ РїСЂРёРІС‹С‡РєРё"
+0033:             )
+0034: 
+0035:         if is_pleasant:
+0036:             if reward:
+0037:                 raise serializers.ValidationError(
+0038:                     "РЈ РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёСЏ"
+0039:                 )
+0040:             if related_habit:
+0041:                 raise serializers.ValidationError(
+0042:                     "РЈ РїСЂРёСЏС‚РЅРѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЃРІСЏР·Р°РЅРЅРѕР№ РїСЂРёРІС‹С‡РєРё"
+0043:                 )
+0044: 
+0045:         return data
+0046: 
+0047:     def create(self, validated_data):
+0048:         """РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё РЅР°Р·РЅР°С‡Р°РµРј С‚РµРєСѓС‰РµРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0049:         validated_data['user'] = self.context['request'].user
+0050:         return super().create(validated_data)
+0051: 
+0052: 
+0053: class PublicHabitSerializer(serializers.ModelSerializer):
+0054:     """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє (С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ)"""
+0055:     user = serializers.StringRelatedField(read_only=True)
+0056: 
+0057:     class Meta:
+0058:         model = Habit
+0059:         fields = [
+0060:             'id', 'user', 'place', 'time', 'action', 'frequency',
+0061:             'duration', 'created_at'
+0062:         ]
+0063:         read_only_fields = fields
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\tasks.py
+================================================================================
+0001: import logging
+0002: from django.conf import settings
+0003: from django.contrib.auth import get_user_model
+0004: import requests
+0005: 
+0006: logger = logging.getLogger(__name__)
+0007: User = get_user_model()
+0008: 
+0009: # РќР°СЃС‚СЂР°РёРІР°РµРј Р»РѕРіРёСЂРѕРІР°РЅРёРµ
+0010: logging.basicConfig(level=logging.INFO)
+0011: logger.setLevel(logging.INFO)
+0012: 
+0013: 
+0014: def send_habit_reminder(chat_id, message):
+0015:     """РЎРёРЅС…СЂРѕРЅРЅР°СЏ РѕС‚РїСЂР°РІРєР° СЃРѕРѕР±С‰РµРЅРёСЏ РІ Telegram СЃ РїРѕРґСЂРѕР±РЅС‹Рј Р»РѕРіРёСЂРѕРІР°РЅРёРµРј"""
+0016:     logger.info("=== РќРђР§РђР›Рћ РћРўРџР РђР’РљР TELEGRAM РЎРћРћР‘Р©Р•РќРРЇ ===")
+0017:     logger.info(f"Chat ID: {chat_id}")
+0018:     logger.info(f"Message: {message}")
+0019: 
+0020:     if not settings.TELEGRAM_BOT_TOKEN:
+0021:         logger.error("вќЊ TELEGRAM_BOT_TOKEN РЅРµ РЅР°СЃС‚СЂРѕРµРЅ!")
+0022:         return False
+0023: 
+0024:     logger.info("вњ… TELEGRAM_BOT_TOKEN РЅР°Р№РґРµРЅ")
+0025: 
+0026:     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+0027:     payload = {
+0028:         'chat_id': chat_id,
+0029:         'text': message,
+0030:         'parse_mode': 'HTML'
+0031:     }
+0032: 
+0033:     logger.info(f"URL: {url}")
+0034:     logger.info(f"Payload: {payload}")
+0035: 
+0036:     try:
+0037:         logger.info("рџ”„ РћС‚РїСЂР°РІРєР° Р·Р°РїСЂРѕСЃР° Рє Telegram API...")
+0038:         response = requests.post(url, json=payload, timeout=10)
+0039:         logger.info(f"вњ… РћС‚РІРµС‚ РїРѕР»СѓС‡РµРЅ. Status code: {response.status_code}")
+0040:         logger.info(f"рџ“Ё Response text: {response.text}")
+0041: 
+0042:         if response.status_code == 200:
+0043:             logger.info("рџЋ‰ РЎРѕРѕР±С‰РµРЅРёРµ СѓСЃРїРµС€РЅРѕ РѕС‚РїСЂР°РІР»РµРЅРѕ!")
+0044:             return True
+0045:         else:
+0046:             logger.error(f"вќЊ РћС€РёР±РєР° Telegram API: {response.status_code}")
+0047:             logger.error(f"рџ“ќ Р”РµС‚Р°Р»Рё: {response.text}")
+0048:             return False
+0049:     except Exception as e:
+0050:         logger.error(f"рџ’Ґ РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ Р·Р°РїСЂРѕСЃР°: {e}")
+0051:         return False
+0052: 
+0053: 
+0054: from celery import shared_task
+0055: 
+0056: 
+0057: @shared_task
+0058: def debug_task():
+0059:     """РЎР°РјР°СЏ РїСЂРѕСЃС‚Р°СЏ Р·Р°РґР°С‡Р° РґР»СЏ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ"""
+0060:     logger.info("=== Р’Р«РџРћР›РќР•РќРР• DEBUG TASK ===")
+0061:     return "рџЋ‰ Debug task executed!"
+0062: 
+0063: 
+0064: @shared_task
+0065: def send_test_notification():
+0066:     """РћС‚РїСЂР°РІРєР° С‚РµСЃС‚РѕРІРѕРіРѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ СЃ РїРѕРґСЂРѕР±РЅС‹Рј Р»РѕРіРёСЂРѕРІР°РЅРёРµРј"""
+0067:     logger.info("=== РќРђР§РђР›Рћ РћРўРџР РђР’РљР РўР•РЎРўРћР’РћР“Рћ РЈР’Р•Р”РћРњР›Р•РќРРЇ ===")
+0068: 
+0069:     # РќР°С…РѕРґРёРј РїРµСЂРІРѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃ Telegram
+0070:     user = User.objects.filter(telegram_chat_id__isnull=False).first()
+0071: 
+0072:     if not user:
+0073:         logger.error("вќЊ РќРµ РЅР°Р№РґРµРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ telegram_chat_id")
+0074:         return "вќЊ No users with Telegram"
+0075: 
+0076:     logger.info(f"вњ… РќР°Р№РґРµРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ: {user.username}")
+0077:     logger.info(f"рџ“± Chat ID: {user.telegram_chat_id}")
+0078:     logger.info(f"рџ”” РЈРІРµРґРѕРјР»РµРЅРёСЏ РІРєР»СЋС‡РµРЅС‹: {user.telegram_notifications}")
+0079: 
+0080:     if not user.telegram_notifications:
+0081:         logger.warning("вљ пёЏ РЈРІРµРґРѕРјР»РµРЅРёСЏ РѕС‚РєР»СЋС‡РµРЅС‹ Сѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")
+0082: 
+0083:     message = (
+0084:         "рџ§Є <b>РўРµСЃС‚РѕРІРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ!</b>\n\n"
+0085:         "Р­С‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ РїСЂРёС€Р»Рѕ С‡РµСЂРµР· СЃРёСЃС‚РµРјСѓ СѓРІРµРґРѕРјР»РµРЅРёР№.\n"
+0086:         "вњ… Р’СЃРµ СЂР°Р±РѕС‚Р°РµС‚ РєРѕСЂСЂРµРєС‚РЅРѕ!\n\n"
+0087:         "рџ’Є РўРµРїРµСЂСЊ РІС‹ Р±СѓРґРµС‚Рµ РїРѕР»СѓС‡Р°С‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ РїСЂРёРІС‹С‡РєР°С…!"
+0088:     )
+0089: 
+0090:     logger.info("рџ”„ Р’С‹Р·РѕРІ С„СѓРЅРєС†РёРё РѕС‚РїСЂР°РІРєРё СЃРѕРѕР±С‰РµРЅРёСЏ...")
+0091:     success = send_habit_reminder(user.telegram_chat_id, message)
+0092: 
+0093:     if success:
+0094:         logger.info("рџЋ‰ Р—Р°РґР°С‡Р° РІС‹РїРѕР»РЅРµРЅР° СѓСЃРїРµС€РЅРѕ!")
+0095:         return "вњ… РўРµСЃС‚РѕРІРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ РѕС‚РїСЂР°РІР»РµРЅРѕ!"
+0096:     else:
+0097:         logger.error("вќЊ Р—Р°РґР°С‡Р° Р·Р°РІРµСЂС€РёР»Р°СЃСЊ СЃ РѕС€РёР±РєРѕР№")
+0098:         return "вќЊ РћС€РёР±РєР° РїСЂРё РѕС‚РїСЂР°РІРєРµ СѓРІРµРґРѕРјР»РµРЅРёСЏ"
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\telegram_bot.py
+================================================================================
+0001: import logging
+0002: from telegram import Update
+0003: from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+0004: from django.conf import settings
+0005: from asgiref.sync import sync_to_async
+0006: from django.contrib.auth import get_user_model
+0007: 
+0008: User = get_user_model()
+0009: logger = logging.getLogger(__name__)
+0010: 
+0011: 
+0012: class HabitTrackerBot:
+0013:     def __init__(self):
+0014:         if not settings.TELEGRAM_BOT_TOKEN:
+0015:             raise ValueError("TELEGRAM_BOT_TOKEN not set in settings")
+0016: 
+0017:         self.token = settings.TELEGRAM_BOT_TOKEN
+0018:         self.application = Application.builder().token(self.token).build()
+0019:         self.setup_handlers()
+0020: 
+0021:     def setup_handlers(self):
+0022:         """РќР°СЃС‚СЂРѕР№РєР° РѕР±СЂР°Р±РѕС‚С‡РёРєРѕРІ РєРѕРјР°РЅРґ"""
+0023:         self.application.add_handler(CommandHandler("start", self.start))
+0024:         self.application.add_handler(CommandHandler("help", self.help_command))
+0025:         self.application.add_handler(CommandHandler("my_habits", self.my_habits))
+0026:         self.application.add_handler(CommandHandler("notifications", self.toggle_notifications))
+0027:         self.application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
+0028: 
+0029:     @sync_to_async
+0030:     def get_user_by_chat_id(self, chat_id):
+0031:         """РђСЃРёРЅС…СЂРѕРЅРЅРѕ РїРѕР»СѓС‡Р°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ chat_id"""
+0032:         try:
+0033:             return User.objects.get(telegram_chat_id=chat_id)
+0034:         except User.DoesNotExist:
+0035:             return None
+0036: 
+0037:     @sync_to_async
+0038:     def get_user_by_email(self, email):
+0039:         """РђСЃРёРЅС…СЂРѕРЅРЅРѕ РїРѕР»СѓС‡Р°РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ email"""
+0040:         try:
+0041:             return User.objects.get(email=email)
+0042:         except User.DoesNotExist:
+0043:             return None
+0044: 
+0045:     @sync_to_async
+0046:     def save_user(self, user):
+0047:         """РђСЃРёРЅС…СЂРѕРЅРЅРѕ СЃРѕС…СЂР°РЅСЏРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0048:         user.save()
+0049: 
+0050:     @sync_to_async
+0051:     def get_user_habits(self, user):
+0052:         """РђСЃРёРЅС…СЂРѕРЅРЅРѕ РїРѕР»СѓС‡Р°РµРј РїСЂРёРІС‹С‡РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0053:         from .models import Habit  # Р›РѕРєР°Р»СЊРЅС‹Р№ РёРјРїРѕСЂС‚ С‡С‚РѕР±С‹ РёР·Р±РµР¶Р°С‚СЊ С†РёРєР»РёС‡РµСЃРєРёС… РёРјРїРѕСЂС‚РѕРІ
+0054:         return list(Habit.objects.filter(user=user, is_pleasant=False))
+0055: 
+0056:     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+0057:         """РћР±СЂР°Р±РѕС‚С‡РёРє РєРѕРјР°РЅРґС‹ /start"""
+0058:         chat_id = update.effective_chat.id
+0059:         username = update.effective_user.username
+0060: 
+0061:         # РђСЃРёРЅС…СЂРѕРЅРЅРѕ РїСЂРѕРІРµСЂСЏРµРј, РїСЂРёРІСЏР·Р°РЅ Р»Рё СѓР¶Рµ СЌС‚РѕС‚ chat_id
+0062:         existing_user = await self.get_user_by_chat_id(chat_id)
+0063: 
+0064:         if existing_user:
+0065:             await update.message.reply_text(
+0066:                 f"РЎ РІРѕР·РІСЂР°С‰РµРЅРёРµРј, {existing_user.username}! рџЋ‰\n\n"
+0067:                 f"Р’Р°С€ Р°РєРєР°СѓРЅС‚ СѓР¶Рµ РїСЂРёРІСЏР·Р°РЅ.\n"
+0068:                 f"РСЃРїРѕР»СЊР·СѓР№С‚Рµ /my_habits С‡С‚РѕР±С‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ СЃРІРѕРё РїСЂРёРІС‹С‡РєРё.\n"
+0069:                 f"РСЃРїРѕР»СЊР·СѓР№С‚Рµ /notifications С‡С‚РѕР±С‹ СѓРїСЂР°РІР»СЏС‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏРјРё."
+0070:             )
+0071:             return
+0072: 
+0073:         # РџСЂРѕСЃРёРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІРІРµСЃС‚Рё email РґР»СЏ РїСЂРёРІСЏР·РєРё
+0074:         await update.message.reply_text(
+0075:             "рџ‘‹ Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє!\n\n"
+0076:             "Р”Р»СЏ РїСЂРёРІСЏР·РєРё Telegram Р°РєРєР°СѓРЅС‚Р° РІРІРµРґРёС‚Рµ РІР°С€ email, "
+0077:             "РєРѕС‚РѕСЂС‹Р№ РІС‹ РёСЃРїРѕР»СЊР·РѕРІР°Р»Рё РїСЂРё СЂРµРіРёСЃС‚СЂР°С†РёРё РЅР° СЃР°Р№С‚Рµ.\n\n"
+0078:             "РџСЂРёРјРµСЂ: user@example.com"
+0079:         )
+0080: 
+0081:     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+0082:         """РћР±СЂР°Р±РѕС‚С‡РёРє РєРѕРјР°РЅРґС‹ /help"""
+0083:         help_text = """
+0084: рџ¤– *РљРѕРјР°РЅРґС‹ Р±РѕС‚Р°:*
+0085: /start - РќР°С‡Р°С‚СЊ СЂР°Р±РѕС‚Сѓ СЃ Р±РѕС‚РѕРј
+0086: /my_habits - РџРѕРєР°Р·Р°С‚СЊ РјРѕРё РїСЂРёРІС‹С‡РєРё
+0087: /notifications - Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏ
+0088: /help - РџРѕРєР°Р·Р°С‚СЊ СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ
+0089: 
+0090: рџ“‹ *РљР°Рє СЌС‚Рѕ СЂР°Р±РѕС‚Р°РµС‚:*
+0091: 1. Р‘РѕС‚ Р±СѓРґРµС‚ РїСЂРёСЃС‹Р»Р°С‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ РІР°С€РёС… РїСЂРёРІС‹С‡РєР°С…
+0092: 2. Р’СЃРµ РґР°РЅРЅС‹Рµ СЃРёРЅС…СЂРѕРЅРёР·РёСЂСѓСЋС‚СЃСЏ СЃ РІР°С€РёРј Р°РєРєР°СѓРЅС‚РѕРј РЅР° СЃР°Р№С‚Рµ
+0093: 
+0094: рџ’Ў *Р”Р»СЏ РїСЂРёРІСЏР·РєРё Р°РєРєР°СѓРЅС‚Р° РїСЂРѕСЃС‚Рѕ РІРІРµРґРёС‚Рµ РІР°С€ email*
+0095:         """
+0096:         await update.message.reply_text(help_text, parse_mode='Markdown')
+0097: 
+0098:     async def my_habits(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+0099:         """РџРѕРєР°Р·Р°С‚СЊ РїСЂРёРІС‹С‡РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0100:         chat_id = update.effective_chat.id
+0101: 
+0102:         user = await self.get_user_by_chat_id(chat_id)
+0103:         if not user:
+0104:             await update.message.reply_text(
+0105:                 "вќЊ Р’Р°С€ Р°РєРєР°СѓРЅС‚ РЅРµ РїСЂРёРІСЏР·Р°РЅ. Р’РІРµРґРёС‚Рµ РІР°С€ email РґР»СЏ РїСЂРёРІСЏР·РєРё."
+0106:             )
+0107:             return
+0108: 
+0109:         habits = await self.get_user_habits(user)
+0110: 
+0111:         if habits:
+0112:             message = "рџ“‹ *Р’Р°С€Рё РїСЂРёРІС‹С‡РєРё:*\n\n"
+0113:             for habit in habits:
+0114:                 message += f"рџЋЇ *{habit.action}*\n"
+0115:                 message += f"   вЏ° {habit.time.strftime('%H:%M')}\n"
+0116:                 message += f"   рџ“Ќ {habit.place}\n"
+0117:                 message += f"   рџ”„ СЂР°Р· РІ {habit.frequency} РґРЅРµР№\n\n"
+0118:         else:
+0119:             message = "РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РїСЂРёРІС‹С‡РµРє. РЎРѕР·РґР°Р№С‚Рµ РёС… РЅР° СЃР°Р№С‚Рµ! рџЊџ"
+0120: 
+0121:         await update.message.reply_text(message, parse_mode='Markdown')
+0122: 
+0123:     async def toggle_notifications(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+0124:         """Р’РєР»СЋС‡РёС‚СЊ/РІС‹РєР»СЋС‡РёС‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏ"""
+0125:         chat_id = update.effective_chat.id
+0126: 
+0127:         user = await self.get_user_by_chat_id(chat_id)
+0128:         if not user:
+0129:             await update.message.reply_text(
+0130:                 "вќЊ Р’Р°С€ Р°РєРєР°СѓРЅС‚ РЅРµ РїСЂРёРІСЏР·Р°РЅ. Р’РІРµРґРёС‚Рµ РІР°С€ email РґР»СЏ РїСЂРёРІСЏР·РєРё."
+0131:             )
+0132:             return
+0133: 
+0134:         user.telegram_notifications = not user.telegram_notifications
+0135:         await self.save_user(user)
+0136: 
+0137:         status = "РІРєР»СЋС‡РµРЅС‹" if user.telegram_notifications else "РІС‹РєР»СЋС‡РµРЅС‹"
+0138:         await update.message.reply_text(
+0139:             f"рџ”” РЈРІРµРґРѕРјР»РµРЅРёСЏ {status}!\n"
+0140:             f"РўРµРїРµСЂСЊ РІС‹ {'Р±СѓРґРµС‚Рµ' if user.telegram_notifications else 'РЅРµ Р±СѓРґРµС‚Рµ'} РїРѕР»СѓС‡Р°С‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ РїСЂРёРІС‹С‡РєР°С…."
+0141:         )
+0142: 
+0143:     async def handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+0144:         """РћР±СЂР°Р±РѕС‚РєР° С‚РµРєСЃС‚РѕРІС‹С… СЃРѕРѕР±С‰РµРЅРёР№ (РґР»СЏ РїСЂРёРІСЏР·РєРё РїРѕ email)"""
+0145:         chat_id = update.effective_chat.id
+0146:         text = update.message.text.strip()
+0147:         telegram_username = update.effective_user.username
+0148: 
+0149:         # РџСЂРѕРІРµСЂСЏРµРј, СЏРІР»СЏРµС‚СЃСЏ Р»Рё СЃРѕРѕР±С‰РµРЅРёРµ email'РѕРј
+0150:         if '@' in text and ' ' not in text:  # РџСЂРѕСЃС‚Р°СЏ РїСЂРѕРІРµСЂРєР° РЅР° email
+0151:             # РџСЂРѕРІРµСЂСЏРµРј, РЅРµ РїСЂРёРІСЏР·Р°РЅ Р»Рё СѓР¶Рµ СЌС‚РѕС‚ chat_id
+0152:             existing_user = await self.get_user_by_chat_id(chat_id)
+0153:             if existing_user:
+0154:                 await update.message.reply_text(
+0155:                     f"вќЊ Р’Р°С€ Р°РєРєР°СѓРЅС‚ СѓР¶Рµ РїСЂРёРІСЏР·Р°РЅ Рє РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ {existing_user.username}.\n"
+0156:                     f"РСЃРїРѕР»СЊР·СѓР№С‚Рµ /my_habits С‡С‚РѕР±С‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ СЃРІРѕРё РїСЂРёРІС‹С‡РєРё."
+0157:                 )
+0158:                 return
+0159: 
+0160:             # РС‰РµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РїРѕ email
+0161:             user = await self.get_user_by_email(text)
+0162:             if not user:
+0163:                 await update.message.reply_text(
+0164:                     "вќЊ РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј email РЅРµ РЅР°Р№РґРµРЅ.\n"
+0165:                     "РџСЂРѕРІРµСЂСЊС‚Рµ РїСЂР°РІРёР»СЊРЅРѕСЃС‚СЊ email РёР»Рё Р·Р°СЂРµРіРёСЃС‚СЂРёСЂСѓР№С‚РµСЃСЊ РЅР° СЃР°Р№С‚Рµ."
+0166:                 )
+0167:                 return
+0168: 
+0169:             # РџСЂРѕРІРµСЂСЏРµРј, РЅРµ РїСЂРёРІСЏР·Р°РЅ Р»Рё email Рє РґСЂСѓРіРѕРјСѓ Telegram Р°РєРєР°СѓРЅС‚Сѓ
+0170:             if user.telegram_chat_id:
+0171:                 await update.message.reply_text(
+0172:                     "вќЊ Р­С‚РѕС‚ email СѓР¶Рµ РїСЂРёРІСЏР·Р°РЅ Рє РґСЂСѓРіРѕРјСѓ Telegram Р°РєРєР°СѓРЅС‚Сѓ.\n"
+0173:                     "РћР±СЂР°С‚РёС‚РµСЃСЊ Рє Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂСѓ РґР»СЏ СЂРµС€РµРЅРёСЏ РїСЂРѕР±Р»РµРјС‹."
+0174:                 )
+0175:                 return
+0176: 
+0177:             # РџСЂРёРІСЏР·С‹РІР°РµРј Telegram Рє РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
+0178:             user.telegram_chat_id = chat_id
+0179:             user.telegram_username = telegram_username
+0180:             await self.save_user(user)
+0181: 
+0182:             await update.message.reply_text(
+0183:                 f"вњ… РђРєРєР°СѓРЅС‚ СѓСЃРїРµС€РЅРѕ РїСЂРёРІСЏР·Р°РЅ!\n"
+0184:                 f"Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ, {user.username}! рџЋ‰\n\n"
+0185:                 f"РўРµРїРµСЂСЊ РІС‹ Р±СѓРґРµС‚Рµ РїРѕР»СѓС‡Р°С‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ СЃРІРѕРёС… РїСЂРёРІС‹С‡РєР°С….\n"
+0186:                 f"РСЃРїРѕР»СЊР·СѓР№С‚Рµ /my_habits С‡С‚РѕР±С‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ СЃРІРѕРё РїСЂРёРІС‹С‡РєРё.\n"
+0187:                 f"РСЃРїРѕР»СЊР·СѓР№С‚Рµ /notifications С‡С‚РѕР±С‹ СѓРїСЂР°РІР»СЏС‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏРјРё."
+0188:             )
+0189:         else:
+0190:             await update.message.reply_text(
+0191:                 "рџ¤” РќРµ РїРѕРЅРёРјР°СЋ РІР°С€Рµ СЃРѕРѕР±С‰РµРЅРёРµ.\n\n"
+0192:                 "Р”Р»СЏ РїСЂРёРІСЏР·РєРё Р°РєРєР°СѓРЅС‚Р° РІРІРµРґРёС‚Рµ РІР°С€ email.\n"
+0193:                 "РџСЂРёРјРµСЂ: user@example.com\n\n"
+0194:                 "РР»Рё РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєРѕРјР°РЅРґС‹:\n"
+0195:                 "/help - РїРѕРєР°Р·Р°С‚СЊ СЃРїСЂР°РІРєСѓ"
+0196:             )
+0197: 
+0198:     def run(self):
+0199:         """Р—Р°РїСѓСЃРє Р±РѕС‚Р°"""
+0200:         logger.info("Starting Telegram bot...")
+0201:         self.application.run_polling()
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\tests.py
@@ -279,11 +1389,259 @@
 0003: # Create your tests here.
 
 ================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\urls.py
+================================================================================
+0001: from django.urls import path
+0002: from .views import (
+0003:     HabitListCreateView,
+0004:     HabitRetrieveUpdateDestroyView,
+0005:     PublicHabitListView,
+0006:     HabitListView,
+0007:     HabitDetailView,
+0008:     PublicHabitsHTMLView,
+0009:     NotificationsView,
+0010:     SendTestNotificationView,
+0011:     TestHabitReminderView,
+0012:     ToggleNotificationsView,
+0013: )
+0014: 
+0015: app_name = 'habits'
+0016: 
+0017: # API endpoints
+0018: api_urlpatterns = [
+0019:     path('api/habits/', HabitListCreateView.as_view(), name='api-habit-list'),
+0020:     path('api/habits/<int:pk>/', HabitRetrieveUpdateDestroyView.as_view(), name='api-habit-detail'),
+0021:     path('api/habits/public/', PublicHabitListView.as_view(), name='api-public-habits'),
+0022:     path('api/notifications/test/', SendTestNotificationView.as_view(), name='send_test_notification'),
+0023:     path('api/notifications/test-habit/', TestHabitReminderView.as_view(), name='test_habit_reminder'),
+0024:     path('api/notifications/toggle/', ToggleNotificationsView.as_view(), name='toggle_notifications'),
+0025: ]
+0026: 
+0027: # HTML endpoints
+0028: html_urlpatterns = [
+0029:     path('html/habits/', HabitListView.as_view(), name='html-habit-list'),
+0030:     path('html/habits/<int:pk>/', HabitDetailView.as_view(), name='html-habit-detail'),
+0031:     path('html/habits/public/', PublicHabitsHTMLView.as_view(), name='html-public-habits'),
+0032:     path('html/notifications/', NotificationsView.as_view(), name='notifications'),
+0033: ]
+0034: 
+0035: # РћР±СЉРµРґРёРЅСЏРµРј РІСЃРµ РїСѓС‚Рё
+0036: urlpatterns = api_urlpatterns + html_urlpatterns
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\habits\validators.py
+================================================================================
+0001: from django.core.exceptions import ValidationError
+0002: 
+0003: 
+0004: def validate_habit_duration(value, is_pleasant=False):
+0005:     """
+0006:     Р’Р°Р»РёРґР°С‚РѕСЂ РґР»СЏ РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ
+0007:     РџРѕР»РµР·РЅР°СЏ РїСЂРёРІС‹С‡РєР°: РЅРµ Р±РѕР»СЊС€Рµ 120 СЃРµРєСѓРЅРґ
+0008:     РџСЂРёСЏС‚РЅР°СЏ РїСЂРёРІС‹С‡РєР°: Р±РµР· РѕРіСЂР°РЅРёС‡РµРЅРёР№
+0009:     """
+0010:     if not is_pleasant and value > 120:
+0011:         raise ValidationError(
+0012:             'Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РїРѕР»РµР·РЅРѕР№ РїСЂРёРІС‹С‡РєРё РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РЅРµ Р±РѕР»СЊС€Рµ 120 СЃРµРєСѓРЅРґ',
+0013:             params={'value': value},
+0014:         )
+0015: 
+0016: 
+0017: def validate_habit_frequency(value):
+0018:     """Р’Р°Р»РёРґР°С‚РѕСЂ РґР»СЏ РїРµСЂРёРѕРґРёС‡РЅРѕСЃС‚Рё (РЅРµ СЂРµР¶Рµ 1 СЂР°Р·Р° РІ 7 РґРЅРµР№)"""
+0019:     if value > 7:
+0020:         raise ValidationError(
+0021:             'РќРµР»СЊР·СЏ РІС‹РїРѕР»РЅСЏС‚СЊ РїСЂРёРІС‹С‡РєСѓ СЂРµР¶Рµ, С‡РµРј 1 СЂР°Р· РІ 7 РґРЅРµР№',
+0022:             params={'value': value},
+0023:         )
+
+================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\views.py
 ================================================================================
-0001: from django.shortcuts import render
-0002: 
-0003: # Create your views here.
+0001: from rest_framework import generics, permissions
+0002: from django_filters.rest_framework import DjangoFilterBackend
+0003: from rest_framework.filters import OrderingFilter
+0004: from django.views.generic import ListView, DetailView
+0005: from django.contrib.auth.mixins import LoginRequiredMixin
+0006: 
+0007: from .models import Habit
+0008: from .serializers import HabitSerializer, PublicHabitSerializer
+0009: from .permissions import IsOwner
+0010: from django.http import Http404
+0011: from django.views.generic import TemplateView
+0012: from django.http import JsonResponse
+0013: from django.views import View
+0014: from .tasks import send_test_notification
+0015: from django.shortcuts import redirect
+0016: from django.contrib import messages
+0017: import json
+0018: 
+0019: 
+0020: # API Views
+0021: class HabitListCreateView(generics.ListCreateAPIView):
+0022:     """API РґР»СЏ СЃРѕР·РґР°РЅРёСЏ Рё РїСЂРѕСЃРјРѕС‚СЂР° СЃРІРѕРёС… РїСЂРёРІС‹С‡РµРє"""
+0023:     serializer_class = HabitSerializer
+0024:     permission_classes = [permissions.IsAuthenticated, IsOwner]
+0025:     filter_backends = [DjangoFilterBackend, OrderingFilter]
+0026:     filterset_fields = ['is_pleasant', 'is_public']
+0027:     ordering_fields = ['time', 'created_at']
+0028: 
+0029:     def get_queryset(self):
+0030:         return Habit.objects.filter(user=self.request.user)
+0031: 
+0032:     def perform_create(self, serializer):
+0033:         serializer.save(user=self.request.user)
+0034: 
+0035: 
+0036: class HabitRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+0037:     """API РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°, РѕР±РЅРѕРІР»РµРЅРёСЏ Рё СѓРґР°Р»РµРЅРёСЏ РїСЂРёРІС‹С‡РєРё"""
+0038:     serializer_class = HabitSerializer
+0039:     permission_classes = [permissions.IsAuthenticated, IsOwner]
+0040: 
+0041:     def get_queryset(self):
+0042:         return Habit.objects.filter(user=self.request.user)
+0043: 
+0044: 
+0045: class PublicHabitListView(generics.ListAPIView):
+0046:     """API РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР° РїСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє"""
+0047:     serializer_class = PublicHabitSerializer
+0048:     permission_classes = [permissions.IsAuthenticated]
+0049: 
+0050:     def get_queryset(self):
+0051:         return Habit.objects.filter(is_public=True).exclude(user=self.request.user)
+0052: 
+0053: 
+0054: # HTML Views
+0055: class HabitListView(LoginRequiredMixin, ListView):
+0056:     """HTML СЃС‚СЂР°РЅРёС†Р° СЃРѕ СЃРїРёСЃРєРѕРј РїСЂРёРІС‹С‡РµРє РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"""
+0057:     model = Habit
+0058:     template_name = 'habits/habit_list.html'
+0059:     context_object_name = 'habits'
+0060:     paginate_by = 5
+0061: 
+0062:     def get_queryset(self):
+0063:         queryset = Habit.objects.filter(user=self.request.user).order_by('-created_at')
+0064: 
+0065:         # РЈРїСЂРѕС‰РµРЅРЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ
+0066:         habit_type = self.request.GET.get('type')
+0067:         if habit_type == 'useful':
+0068:             return queryset.filter(is_pleasant=False)
+0069:         elif habit_type == 'pleasant':
+0070:             return queryset.filter(is_pleasant=True)
+0071: 
+0072:         return queryset
+0073: 
+0074: 
+0075: class PublicHabitsHTMLView(LoginRequiredMixin, ListView):
+0076:     """HTML СЃС‚СЂР°РЅРёС†Р° СЃ РїСѓР±Р»РёС‡РЅС‹РјРё РїСЂРёРІС‹С‡РєР°РјРё"""
+0077:     model = Habit
+0078:     template_name = 'habits/public_habits.html'
+0079:     context_object_name = 'habits'
+0080: 
+0081:     def get_queryset(self):
+0082:         queryset = Habit.objects.filter(is_public=True).exclude(user=self.request.user)
+0083: 
+0084:         # РЈРїСЂРѕС‰РµРЅРЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ
+0085:         habit_type = self.request.GET.get('type')
+0086:         if habit_type == 'useful':
+0087:             return queryset.filter(is_pleasant=False)
+0088:         elif habit_type == 'pleasant':
+0089:             return queryset.filter(is_pleasant=True)
+0090: 
+0091:         return queryset
+0092: 
+0093: 
+0094: class HabitDetailView(LoginRequiredMixin, DetailView):
+0095:     """HTML СЃС‚СЂР°РЅРёС†Р° РґРµС‚Р°Р»СЊРЅРѕРіРѕ РїСЂРѕСЃРјРѕС‚СЂР° РїСЂРёРІС‹С‡РєРё"""
+0096:     model = Habit
+0097:     template_name = 'habits/habit_detail.html'
+0098:     context_object_name = 'habit'
+0099: 
+0100:     def get_queryset(self):
+0101:         """РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РјРѕР¶РµС‚ СЃРјРѕС‚СЂРµС‚СЊ С‚РѕР»СЊРєРѕ СЃРІРѕРё РїСЂРёРІС‹С‡РєРё РР›Р РїСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё РґСЂСѓРіРёС… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"""
+0102:         user_habits = Habit.objects.filter(user=self.request.user)
+0103:         public_habits = Habit.objects.filter(is_public=True).exclude(user=self.request.user)
+0104:         return user_habits | public_habits
+0105: 
+0106:     def get_object(self, queryset=None):
+0107:         """РџРѕР»СѓС‡Р°РµРј РѕР±СЉРµРєС‚ СЃ РїСЂРѕРІРµСЂРєРѕР№ РїСЂР°РІ РґРѕСЃС‚СѓРїР°"""
+0108:         if queryset is None:
+0109:             queryset = self.get_queryset()
+0110: 
+0111:         pk = self.kwargs.get('pk')
+0112:         try:
+0113:             return queryset.get(pk=pk)
+0114:         except Habit.DoesNotExist:
+0115:             raise Http404("РџСЂРёРІС‹С‡РєР° РЅРµ РЅР°Р№РґРµРЅР° РёР»Рё Сѓ РІР°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє РЅРµР№")
+0116: 
+0117: # HTML СЃС‚СЂР°РЅРёС†С‹ СѓРІРµРґРѕРјР»РµРЅРёР№
+0118: class NotificationsView(LoginRequiredMixin, TemplateView):
+0119:     """РЎС‚СЂР°РЅРёС†Р° СѓРїСЂР°РІР»РµРЅРёСЏ СѓРІРµРґРѕРјР»РµРЅРёСЏРјРё"""
+0120:     template_name = 'habits/notifications.html'
+0121: 
+0122:     def get_context_data(self, **kwargs):
+0123:         context = super().get_context_data(**kwargs)
+0124:         context['habits'] = self.request.user.habits.all()
+0125:         return context
+0126: 
+0127: 
+0128: class SendTestNotificationView(LoginRequiredMixin, View):
+0129:     """РћС‚РїСЂР°РІРєР° С‚РµСЃС‚РѕРІРѕРіРѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ (РїСЂРѕСЃС‚Р°СЏ РІРµСЂСЃРёСЏ РґР»СЏ С„РѕСЂРј)"""
+0130: 
+0131:     def post(self, request):
+0132:         from .tasks import send_test_notification
+0133: 
+0134:         if not request.user.telegram_chat_id:
+0135:             messages.error(request, 'вќЊ Telegram Р°РєРєР°СѓРЅС‚ РЅРµ РїСЂРёРІСЏР·Р°РЅ')
+0136:             return redirect('habits:notifications')
+0137: 
+0138:         try:
+0139:             result = send_test_notification.delay()
+0140:             messages.success(request, f'вњ… {result.result}')
+0141:         except Exception as e:
+0142:             messages.error(request, f'вќЊ РћС€РёР±РєР°: {str(e)}')
+0143: 
+0144:         return redirect('habits:notifications')
+0145: 
+0146: 
+0147: class TestHabitReminderView(LoginRequiredMixin, View):
+0148:     """РўРµСЃС‚ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ РїСЂРёРІС‹С‡РєРµ (РїСЂРѕСЃС‚Р°СЏ РІРµСЂСЃРёСЏ РґР»СЏ С„РѕСЂРј)"""
+0149: 
+0150:     def post(self, request):
+0151:         from .tasks import send_habit_reminder
+0152: 
+0153:         if not request.user.telegram_chat_id:
+0154:             messages.error(request, 'вќЊ Telegram Р°РєРєР°СѓРЅС‚ РЅРµ РїСЂРёРІСЏР·Р°РЅ')
+0155:             return redirect('habits:notifications')
+0156: 
+0157:         # Р‘РµСЂРµРј РїРµСЂРІСѓСЋ РїСЂРёРІС‹С‡РєСѓ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ С‚РµСЃС‚Р°
+0158:         user_habits = request.user.habits.all()
+0159:         if not user_habits.exists():
+0160:             messages.error(request, 'вќЊ РЈ РІР°СЃ РЅРµС‚ РїСЂРёРІС‹С‡РµРє РґР»СЏ С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ')
+0161:             return redirect('habits:notifications')
+0162: 
+0163:         try:
+0164:             habit = user_habits.first()
+0165:             result = send_habit_reminder.delay(habit.id)
+0166:             messages.success(request, f'вњ… РќР°РїРѕРјРёРЅР°РЅРёРµ РѕС‚РїСЂР°РІР»РµРЅРѕ РґР»СЏ: {habit.action}')
+0167:         except Exception as e:
+0168:             messages.error(request, f'вќЊ РћС€РёР±РєР°: {str(e)}')
+0169: 
+0170:         return redirect('habits:notifications')
+0171: 
+0172: 
+0173: class ToggleNotificationsView(LoginRequiredMixin, View):
+0174:     """Р’РєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ СѓРІРµРґРѕРјР»РµРЅРёР№"""
+0175: 
+0176:     def post(self, request):
+0177:         user = request.user
+0178:         user.telegram_notifications = not user.telegram_notifications
+0179:         user.save()
+0180: 
+0181:         status = "РІРєР»СЋС‡РµРЅС‹" if user.telegram_notifications else "РІС‹РєР»СЋС‡РµРЅС‹"
+0182:         messages.success(request, f"рџ”” РЈРІРµРґРѕРјР»РµРЅРёСЏ {status}")
+0183: 
+0184:         return redirect('habits:notifications')
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\habits\__init__.py
@@ -478,6 +1836,108 @@
 0153:     ]
 
 ================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\migrations\0002_alter_user_role.py
+================================================================================
+0001: # Generated by Django 5.2.6 on 2025-09-18 19:10
+0002: 
+0003: from django.db import migrations, models
+0004: 
+0005: 
+0006: class Migration(migrations.Migration):
+0007: 
+0008:     dependencies = [
+0009:         ("user", "0001_initial"),
+0010:     ]
+0011: 
+0012:     operations = [
+0013:         migrations.AlterField(
+0014:             model_name="user",
+0015:             name="role",
+0016:             field=models.CharField(
+0017:                 choices=[("user", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"), ("manager", "РњРµРЅРµРґР¶РµСЂ")],
+0018:                 default="user",
+0019:                 max_length=10,
+0020:                 verbose_name="Р РѕР»СЊ",
+0021:             ),
+0022:         ),
+0023:     ]
+
+================================================================================
+ФАЙЛ: D:\python\django\cw_habit_tracker\user\migrations\0003_user_telegram_chat_id_user_telegram_notifications_and_more.py
+================================================================================
+0001: # Generated by Django 5.2.6 on 2025-09-22 21:58
+0002: 
+0003: import django.db.models.deletion
+0004: from django.conf import settings
+0005: from django.db import migrations, models
+0006: 
+0007: 
+0008: class Migration(migrations.Migration):
+0009: 
+0010:     dependencies = [
+0011:         ("user", "0002_alter_user_role"),
+0012:     ]
+0013: 
+0014:     operations = [
+0015:         migrations.AddField(
+0016:             model_name="user",
+0017:             name="telegram_chat_id",
+0018:             field=models.BigIntegerField(
+0019:                 blank=True,
+0020:                 help_text="РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‡Р°С‚Р° РґР»СЏ Telegram СѓРІРµРґРѕРјР»РµРЅРёР№",
+0021:                 null=True,
+0022:                 unique=True,
+0023:                 verbose_name="ID С‡Р°С‚Р° РІ Telegram",
+0024:             ),
+0025:         ),
+0026:         migrations.AddField(
+0027:             model_name="user",
+0028:             name="telegram_notifications",
+0029:             field=models.BooleanField(
+0030:                 default=True, help_text="Р’РєР»СЋС‡РµРЅС‹ Р»Рё СѓРІРµРґРѕРјР»РµРЅРёСЏ РІ Telegram", verbose_name="Telegram СѓРІРµРґРѕРјР»РµРЅРёСЏ"
+0031:             ),
+0032:         ),
+0033:         migrations.AddField(
+0034:             model_name="user",
+0035:             name="telegram_username",
+0036:             field=models.CharField(blank=True, max_length=100, null=True, verbose_name="Username РІ Telegram"),
+0037:         ),
+0038:         migrations.CreateModel(
+0039:             name="TelegramUser",
+0040:             fields=[
+0041:                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+0042:                 (
+0043:                     "chat_id",
+0044:                     models.BigIntegerField(
+0045:                         help_text="РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‡Р°С‚Р° СЃ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј",
+0046:                         unique=True,
+0047:                         verbose_name="ID С‡Р°С‚Р° РІ Telegram",
+0048:                     ),
+0049:                 ),
+0050:                 (
+0051:                     "username",
+0052:                     models.CharField(blank=True, max_length=100, null=True, verbose_name="Username РІ Telegram"),
+0053:                 ),
+0054:                 ("is_active", models.BooleanField(default=True, verbose_name="РђРєС‚РёРІРµРЅ")),
+0055:                 ("created_at", models.DateTimeField(auto_now_add=True, verbose_name="Р”Р°С‚Р° РїРѕРґРєР»СЋС‡РµРЅРёСЏ")),
+0056:                 (
+0057:                     "user",
+0058:                     models.OneToOneField(
+0059:                         on_delete=django.db.models.deletion.CASCADE,
+0060:                         related_name="telegram",
+0061:                         to=settings.AUTH_USER_MODEL,
+0062:                         verbose_name="РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+0063:                     ),
+0064:                 ),
+0065:             ],
+0066:             options={
+0067:                 "verbose_name": "Telegram РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ",
+0068:                 "verbose_name_plural": "Telegram РїРѕР»СЊР·РѕРІР°С‚РµР»Рё",
+0069:             },
+0070:         ),
+0071:     ]
+
+================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\user\migrations\__init__.py
 ================================================================================
 
@@ -500,62 +1960,63 @@
 0014:     fieldsets = (
 0015:         (None, {"fields": ("username", "password")}),
 0016:         (_("Personal info"), {"fields": ("email", "country", "phone", "avatar")}),
-0017:         (
-0018:             _("Permissions"),
-0019:             {
-0020:                 "fields": (
-0021:                     "is_active",
-0022:                     "is_blocked",
-0023:                     "is_verified",
-0024:                     "is_staff",
-0025:                     "is_superuser",
-0026:                     "role",
-0027:                     "groups",
-0028:                     "user_permissions",
-0029:                 ),
-0030:             },
-0031:         ),
-0032:         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
-0033:     )
-0034: 
-0035:     add_fieldsets = (
-0036:         (
-0037:             None,
-0038:             {
-0039:                 "classes": ("wide",),
-0040:                 "fields": ("username", "email", "password1", "password2", "role"),
-0041:             },
-0042:         ),
-0043:     )
-0044: 
-0045:     actions = ["block_users", "unblock_users", "make_managers", "make_regular_users"]
-0046: 
-0047:     def block_users(self, request, queryset):
-0048:         queryset.update(is_blocked=True)
-0049:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
-0050: 
-0051:     block_users.short_description = "Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
-0052: 
-0053:     def unblock_users(self, request, queryset):
-0054:         queryset.update(is_blocked=False)
-0055:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
-0056: 
-0057:     unblock_users.short_description = "Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
-0058: 
-0059:     def make_managers(self, request, queryset):
-0060:         queryset.update(role="manager")
-0061:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РјРµРЅРµРґР¶РµСЂР°РјРё")
-0062: 
-0063:     make_managers.short_description = "РЎРґРµР»Р°С‚СЊ РјРµРЅРµРґР¶РµСЂР°РјРё"
-0064: 
-0065:     def make_regular_users(self, request, queryset):
-0066:         queryset.update(role="user")
-0067:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё")
-0068: 
-0069:     make_regular_users.short_description = "РЎРґРµР»Р°С‚СЊ РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё"
-0070: 
+0017:         (_("Telegram settings"), {"fields": ("telegram_chat_id", "telegram_username", "telegram_notifications")}),
+0018:         (
+0019:             _("Permissions"),
+0020:             {
+0021:                 "fields": (
+0022:                     "is_active",
+0023:                     "is_blocked",
+0024:                     "is_verified",
+0025:                     "is_staff",
+0026:                     "is_superuser",
+0027:                     "role",
+0028:                     "groups",
+0029:                     "user_permissions",
+0030:                 ),
+0031:             },
+0032:         ),
+0033:         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+0034:     )
+0035: 
+0036:     add_fieldsets = (
+0037:         (
+0038:             None,
+0039:             {
+0040:                 "classes": ("wide",),
+0041:                 "fields": ("username", "email", "password1", "password2", "role"),
+0042:             },
+0043:         ),
+0044:     )
+0045: 
+0046:     actions = ["block_users", "unblock_users", "make_managers", "make_regular_users"]
+0047: 
+0048:     def block_users(self, request, queryset):
+0049:         queryset.update(is_blocked=True)
+0050:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
+0051: 
+0052:     block_users.short_description = "Р—Р°Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+0053: 
+0054:     def unblock_users(self, request, queryset):
+0055:         queryset.update(is_blocked=False)
+0056:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЂР°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅС‹")
+0057: 
+0058:     unblock_users.short_description = "Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"
+0059: 
+0060:     def make_managers(self, request, queryset):
+0061:         queryset.update(role="manager")
+0062:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РјРµРЅРµРґР¶РµСЂР°РјРё")
+0063: 
+0064:     make_managers.short_description = "РЎРґРµР»Р°С‚СЊ РјРµРЅРµРґР¶РµСЂР°РјРё"
+0065: 
+0066:     def make_regular_users(self, request, queryset):
+0067:         queryset.update(role="user")
+0068:         self.message_user(request, "Р’С‹Р±СЂР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё СЃС‚Р°Р»Рё РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё")
+0069: 
+0070:     make_regular_users.short_description = "РЎРґРµР»Р°С‚СЊ РѕР±С‹С‡РЅС‹РјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё"
 0071: 
-0072: admin.site.register(User, UserAdmin)
+0072: 
+0073: admin.site.register(User, UserAdmin)
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\user\apps.py
@@ -683,74 +2144,130 @@
 0003: from django.db import models
 0004: from phonenumber_field.modelfields import PhoneNumberField
 0005: 
-0006: 
-0007: class User(AbstractUser):
-0008:     username = models.CharField(
-0009:         max_length=50,
-0010:         unique=True,
-0011:         verbose_name="РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
-0012:         help_text="Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
-0013:     )
-0014:     email = models.EmailField(
-0015:         unique=True,
-0016:         blank=False,
-0017:         null=False,
-0018:         verbose_name="email",
-0019:         help_text="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹",
-0020:     )
-0021:     country = models.CharField(
-0022:         max_length=50,
-0023:         blank=True,
-0024:         null=True,
-0025:         verbose_name="РЎС‚СЂР°РЅР°",
-0026:         help_text="Р’РІРµРґРёС‚Рµ СЃС‚СЂР°РЅСѓ",
-0027:     )
-0028: 
-0029:     city = models.CharField(
-0030:         max_length=50,
-0031:         blank=True,
-0032:         null=True,
-0033:         verbose_name="Р“РѕСЂРѕРґ",
-0034:         help_text="Р’РІРµРґРёС‚Рµ РіРѕСЂРѕРґ",
-0035:     )
-0036: 
-0037:     phone = PhoneNumberField(
-0038:         blank=True,
-0039:         null=True,
-0040:         verbose_name="РўРµР»РµС„РѕРЅ",
-0041:         help_text="Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°",
-0042:     )
-0043:     avatar = models.ImageField(
-0044:         upload_to="user/avatars",
-0045:         blank=True,
-0046:         null=True,
-0047:         validators=[FileExtensionValidator(allowed_extensions=["jfif", "jpg", "jpeg", "png"])],
-0048:         verbose_name="РђРІР°С‚Р°СЂ",
-0049:         help_text="Р—Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Р°РІР°С‚Р°СЂР°",
-0050:     )
-0051:     token = models.CharField(max_length=100, verbose_name="РўРѕРєРµРЅ", blank=True, null=True)
-0052:     is_verified = models.BooleanField(default=False, verbose_name="РџРѕРґС‚РІРµСЂР¶РґРµРЅ")
-0053: 
-0054:     USERNAME_FIELD = "email"
-0055:     REQUIRED_FIELDS = [
-0056:         "username",
-0057:     ]
-0058: 
-0059:     ROLES = (("user", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"), ("manager", "РњРµРЅРµРґР¶РµСЂ"), ("moderator", "РњРѕРґРµСЂР°С‚РѕСЂ"))
-0060:     role = models.CharField(max_length=10, choices=ROLES, default="user", verbose_name="Р РѕР»СЊ")
-0061:     is_blocked = models.BooleanField(default=False, verbose_name="Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ")
+0006: from config import settings
+0007: 
+0008: 
+0009: class User(AbstractUser):
+0010:     username = models.CharField(
+0011:         max_length=50,
+0012:         unique=True,
+0013:         verbose_name="РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0014:         help_text="Р’РІРµРґРёС‚Рµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ",
+0015:     )
+0016:     email = models.EmailField(
+0017:         unique=True,
+0018:         blank=False,
+0019:         null=False,
+0020:         verbose_name="email",
+0021:         help_text="Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ СЌР»РµРєС‚СЂРѕРЅРЅРѕР№ РїРѕС‡С‚С‹",
+0022:     )
+0023:     country = models.CharField(
+0024:         max_length=50,
+0025:         blank=True,
+0026:         null=True,
+0027:         verbose_name="РЎС‚СЂР°РЅР°",
+0028:         help_text="Р’РІРµРґРёС‚Рµ СЃС‚СЂР°РЅСѓ",
+0029:     )
+0030: 
+0031:     city = models.CharField(
+0032:         max_length=50,
+0033:         blank=True,
+0034:         null=True,
+0035:         verbose_name="Р“РѕСЂРѕРґ",
+0036:         help_text="Р’РІРµРґРёС‚Рµ РіРѕСЂРѕРґ",
+0037:     )
+0038: 
+0039:     phone = PhoneNumberField(
+0040:         blank=True,
+0041:         null=True,
+0042:         verbose_name="РўРµР»РµС„РѕРЅ",
+0043:         help_text="Р’РІРµРґРёС‚Рµ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°",
+0044:     )
+0045: 
+0046: 
+0047:     avatar = models.ImageField(
+0048:         upload_to="user/avatars",
+0049:         blank=True,
+0050:         null=True,
+0051:         validators=[FileExtensionValidator(allowed_extensions=["jfif", "jpg", "jpeg", "png"])],
+0052:         verbose_name="РђРІР°С‚Р°СЂ",
+0053:         help_text="Р—Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ Р°РІР°С‚Р°СЂР°",
+0054:     )
+0055:     token = models.CharField(max_length=100, verbose_name="РўРѕРєРµРЅ", blank=True, null=True)
+0056:     is_verified = models.BooleanField(default=False, verbose_name="РџРѕРґС‚РІРµСЂР¶РґРµРЅ")
+0057: 
+0058:     USERNAME_FIELD = "email"
+0059:     REQUIRED_FIELDS = [
+0060:         "username",
+0061:     ]
 0062: 
-0063:     def __str__(self):
-0064:         return self.username
-0065: 
-0066:     class Meta:
-0067:         verbose_name = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
-0068:         verbose_name_plural = "РџРѕР»СЊР·РѕРІР°С‚РµР»Рё"
-0069:         db_table = "user"
-0070:         permissions = [
-0071:             ("block_user", "РњРѕР¶РµС‚ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"),
-0072:             ("disable_mailing", "РњРѕР¶РµС‚ РѕС‚РєР»СЋС‡Р°С‚СЊ СЂР°СЃСЃС‹Р»РєРё"),
-0073:         ]
+0063:     telegram_chat_id = models.BigIntegerField(
+0064:         blank=True,
+0065:         null=True,
+0066:         unique=True,
+0067:         verbose_name="ID С‡Р°С‚Р° РІ Telegram",
+0068:         help_text="РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‡Р°С‚Р° РґР»СЏ Telegram СѓРІРµРґРѕРјР»РµРЅРёР№"
+0069:     )
+0070:     telegram_username = models.CharField(
+0071:         max_length=100,
+0072:         blank=True,
+0073:         null=True,
+0074:         verbose_name="Username РІ Telegram"
+0075:     )
+0076:     telegram_notifications = models.BooleanField(
+0077:         default=True,
+0078:         verbose_name="Telegram СѓРІРµРґРѕРјР»РµРЅРёСЏ",
+0079:         help_text="Р’РєР»СЋС‡РµРЅС‹ Р»Рё СѓРІРµРґРѕРјР»РµРЅРёСЏ РІ Telegram"
+0080:     )
+0081: 
+0082:     ROLES = (("user", "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"), ("manager", "РњРµРЅРµРґР¶РµСЂ"))
+0083:     role = models.CharField(max_length=10, choices=ROLES, default="user", verbose_name="Р РѕР»СЊ")
+0084:     is_blocked = models.BooleanField(default=False, verbose_name="Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ")
+0085: 
+0086:     def __str__(self):
+0087:         return self.username
+0088: 
+0089:     class Meta:
+0090:         verbose_name = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
+0091:         verbose_name_plural = "РџРѕР»СЊР·РѕРІР°С‚РµР»Рё"
+0092:         db_table = "user"
+0093:         permissions = [
+0094:             ("block_user", "РњРѕР¶РµС‚ Р±Р»РѕРєРёСЂРѕРІР°С‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"),
+0095:             ("disable_mailing", "РњРѕР¶РµС‚ РѕС‚РєР»СЋС‡Р°С‚СЊ СЂР°СЃСЃС‹Р»РєРё"),
+0096:         ]
+0097: 
+0098: 
+0099: class TelegramUser(models.Model):
+0100:     """РњРѕРґРµР»СЊ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Telegram РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№"""
+0101:     user = models.OneToOneField(
+0102:         settings.AUTH_USER_MODEL,
+0103:         on_delete=models.CASCADE,
+0104:         related_name='telegram',
+0105:         verbose_name="РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
+0106:     )
+0107:     chat_id = models.BigIntegerField(
+0108:         unique=True,
+0109:         verbose_name="ID С‡Р°С‚Р° РІ Telegram",
+0110:         help_text="РЈРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‡Р°С‚Р° СЃ РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј"
+0111:     )
+0112:     username = models.CharField(
+0113:         max_length=100,
+0114:         blank=True,
+0115:         null=True,
+0116:         verbose_name="Username РІ Telegram"
+0117:     )
+0118:     is_active = models.BooleanField(
+0119:         default=True,
+0120:         verbose_name="РђРєС‚РёРІРµРЅ"
+0121:     )
+0122:     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Р”Р°С‚Р° РїРѕРґРєР»СЋС‡РµРЅРёСЏ")
+0123: 
+0124:     class Meta:
+0125:         verbose_name = "Telegram РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ"
+0126:         verbose_name_plural = "Telegram РїРѕР»СЊР·РѕРІР°С‚РµР»Рё"
+0127: 
+0128:     def __str__(self):
+0129:         return f"{self.user.username} ({self.chat_id})"
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\user\permissions.py
@@ -827,33 +2344,32 @@
 0029:             "avatar",
 0030:             "role",
 0031:             "is_blocked",
-0032:             "payments",
-0033:             "is_verified",
-0034:             "date_joined",
-0035:         ]
-0036:         read_only_fields = ["id", "email", "role", "is_blocked", "is_verified", "date_joined"]
+0032:             "is_verified",
+0033:             "date_joined",
+0034:         ]
+0035:         read_only_fields = ["id", "email", "role", "is_blocked", "is_verified", "date_joined"]
+0036: 
 0037: 
-0038: 
-0039: class UserApiRegistrationSerializer(serializers.ModelSerializer):
-0040:     class Meta:
-0041:         model = User
-0042:         fields = [
-0043:             "username",
-0044:             "email",
-0045:             "password",
-0046:             "first_name",
-0047:             "last_name",
-0048:             "country",
-0049:             "city",
-0050:             "phone",
-0051:             "avatar",
-0052:         ]
-0053: 
-0054:     def validate_username(self, value):
-0055:         """РџСЂРѕРІРµСЂРєР° СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё username"""
-0056:         if User.objects.filter(username=value).exclude(id=self.instance.id if self.instance else None).exists():
-0057:             raise serializers.ValidationError("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.")
-0058:         return value
+0038: class UserApiRegistrationSerializer(serializers.ModelSerializer):
+0039:     class Meta:
+0040:         model = User
+0041:         fields = [
+0042:             "username",
+0043:             "email",
+0044:             "password",
+0045:             "first_name",
+0046:             "last_name",
+0047:             "country",
+0048:             "city",
+0049:             "phone",
+0050:             "avatar",
+0051:         ]
+0052: 
+0053:     def validate_username(self, value):
+0054:         """РџСЂРѕРІРµСЂРєР° СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚Рё username"""
+0055:         if User.objects.filter(username=value).exclude(id=self.instance.id if self.instance else None).exists():
+0056:             raise serializers.ValidationError("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚.")
+0057:         return value
 
 ================================================================================
 ФАЙЛ: D:\python\django\cw_habit_tracker\user\tests.py

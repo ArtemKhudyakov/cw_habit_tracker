@@ -12,7 +12,10 @@ dependencies = [
     "djangorestframework-simplejwt (>=5.5.1,<6.0.0)",
     "django-filter (>=25.1,<26.0)",
     "django-extensions (>=4.1,<5.0)",
-    "drf-yasg (>=1.21.10,<2.0.0)"
+    "drf-yasg (>=1.21.10,<2.0.0)",
+    "python-telegram-bot (>=22.4,<23.0)",
+    "celery (>=5.5.3,<6.0.0)",
+    "redis (>=6.4.0,<7.0.0)"
 ]
 
 

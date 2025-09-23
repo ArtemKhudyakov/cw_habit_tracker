@@ -18,6 +18,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'habits:html-public-habits' %}">Публичные привычки</a>
                     </li>
+                    <!-- ДОБАВЛЯЕМ ССЫЛКУ НА УВЕДОМЛЕНИЯ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:notifications' %}">
+                            🔔 Уведомления
+                            {% if user.telegram_chat_id %}
+                                <span class="badge bg-success">Подключено</span>
+                            {% else %}
+                                <span class="badge bg-warning">Отключено</span>
+                            {% endif %}
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
 

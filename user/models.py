@@ -3,6 +3,8 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
+from config import settings
+
 
 class User(AbstractUser):
     username = models.CharField(
@@ -40,6 +42,8 @@ class User(AbstractUser):
         verbose_name="Телефон",
         help_text="Введите номер телефона",
     )
+
+
     avatar = models.ImageField(
         upload_to="user/avatars",
         blank=True,
@@ -56,6 +60,25 @@ class User(AbstractUser):
         "username",
     ]
 
+    telegram_chat_id = models.BigIntegerField(
+        blank=True,
+        null=True,
+        unique=True,
+        verbose_name="ID чата в Telegram",
+        help_text="Уникальный идентификатор чата для Telegram уведомлений"
+    )
+    telegram_username = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Username в Telegram"
+    )
+    telegram_notifications = models.BooleanField(
+        default=True,
+        verbose_name="Telegram уведомления",
+        help_text="Включены ли уведомления в Telegram"
+    )
+
     ROLES = (("user", "Пользователь"), ("manager", "Менеджер"))
     role = models.CharField(max_length=10, choices=ROLES, default="user", verbose_name="Роль")
     is_blocked = models.BooleanField(default=False, verbose_name="Заблокирован")
@@ -71,3 +94,36 @@ class User(AbstractUser):
             ("block_user", "Может блокировать пользователей"),
             ("disable_mailing", "Может отключать рассылки"),
         ]
+
+
+class TelegramUser(models.Model):
+    """Модель для хранения Telegram пользователей"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='telegram',
+        verbose_name="Пользователь"
+    )
+    chat_id = models.BigIntegerField(
+        unique=True,
+        verbose_name="ID чата в Telegram",
+        help_text="Уникальный идентификатор чата с пользователем"
+    )
+    username = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Username в Telegram"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Активен"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата подключения")
+
+    class Meta:
+        verbose_name = "Telegram пользователь"
+        verbose_name_plural = "Telegram пользователи"
+
+    def __str__(self):
+        return f"{self.user.username} ({self.chat_id})"

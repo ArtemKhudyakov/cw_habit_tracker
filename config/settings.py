@@ -161,8 +161,8 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")  # Ваш yandex email
-SERVER_EMAIL = os.getenv("EMAIL_HOST_USER")  # Для ошибок
+DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
+SERVER_EMAIL = os.getenv("EMAIL_HOST_USER")
 
 CACHES = {
     "default": {
@@ -180,3 +180,26 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60 * 2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
+
+CELERY_BEAT_SCHEDULE = {
+    'check-habit-reminders-every-minute': {
+        'task': 'habits.tasks.check_and_send_habit_reminders',
+        'schedule': 60.0,  # Каждую минуту (60 секунд)
+    },
+    'debug-task-every-5-minutes': {
+        'task': 'habits.tasks.debug_task',
+        'schedule': 300.0,  # Каждые 5 минут для тестирования
+    },
+}
+
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')

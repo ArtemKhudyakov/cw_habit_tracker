@@ -1,19 +1,566 @@
-﻿<footer class="bg-dark text-light mt-5 py-4">
+﻿{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mt-4">
+        {% block habits_content %}
+        {% endblock %}
+    </div>
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}РџСЂРёРІС‹С‡РєР° {{ habit.action }} - РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>
+            {% if habit.is_pleasant %}рџЋЃ{% else %}рџЋЇ{% endif %}
+            Р”РµС‚Р°Р»Рё РїСЂРёРІС‹С‡РєРё
+        </h1>
+        <div>
+            <a href="{% url 'habits:api-habit-detail' habit.pk %}" class="btn btn-outline-info btn-sm">API</a>
+            <a href="{% url 'habits:html-habit-list' %}" class="btn btn-secondary btn-sm">в†ђ РќР°Р·Р°Рґ Рє СЃРїРёСЃРєСѓ</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+            <h4 class="card-title mb-0">{{ habit.action }}</h4>
+            {% if habit.user.username != request.user.username %}
+            <small class="text-muted">рџ‘¤ РџСЂРёРІС‹С‡РєР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: {{ habit.user.username }}</small>
+            {% endif %}
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>рџ“‹ РћСЃРЅРѕРІРЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr><th>вЏ° Р’СЂРµРјСЏ РІС‹РїРѕР»РЅРµРЅРёСЏ:</th><td>{{ habit.time }}</td></tr>
+                            <tr><th>рџ“Ќ РњРµСЃС‚Рѕ РІС‹РїРѕР»РЅРµРЅРёСЏ:</th><td>{{ habit.place }}</td></tr>
+                            <tr><th>рџ”„ РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ:</th><td>СЂР°Р· РІ {{ habit.frequency }} РґРЅРµР№</td></tr>
+                            <tr><th>вЏ±пёЏ Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ:</th><td>{{ habit.duration }} СЃРµРєСѓРЅРґ</td></tr>
+                            <tr><th>рџЏ·пёЏ РўРёРї РїСЂРёРІС‹С‡РєРё:</th>
+                                <td>
+                                    {% if habit.is_pleasant %}
+                                    <span class="badge bg-warning">РџСЂРёСЏС‚РЅР°СЏ РїСЂРёРІС‹С‡РєР°</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">РџРѕР»РµР·РЅР°СЏ РїСЂРёРІС‹С‡РєР°</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr><th>рџЊЌ Р’РёРґРёРјРѕСЃС‚СЊ:</th>
+                                <td>
+                                    {% if habit.is_public %}
+                                    <span class="badge bg-success">РџСѓР±Р»РёС‡РЅР°СЏ</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">РџСЂРёРІР°С‚РЅР°СЏ</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>рџ“… Р”Р°С‚С‹</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tr><th>рџ“… РЎРѕР·РґР°РЅР°:</th><td>{{ habit.created_at|date:"d.m.Y H:i" }}</td></tr>
+                            <tr><th>вњЏпёЏ РћР±РЅРѕРІР»РµРЅР°:</th><td>{{ habit.updated_at|date:"d.m.Y H:i" }}</td></tr>
+                        </table>
+                    </div>
+
+                    {% if not habit.is_pleasant %}
+                    <h5 class="mt-4">рџЋЃ РЎРёСЃС‚РµРјР° РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёР№</h5>
+                    <div class="alert {% if habit.reward %}alert-info{% else %}alert-success{% endif %}">
+                        {% if habit.reward %}
+                        <strong>Р’РѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ:</strong>
+                        <span class="fs-5">{{ habit.reward }}</span>
+
+                        {% elif habit.related_habit %}
+                        <strong>РЎРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР°:</strong><br>
+                        <div class="mt-2 p-3 bg-light rounded">
+                            <h6>рџЋЃ {{ habit.related_habit.action }}</h6>
+                            <p class="mb-2">
+                                <small>вЏ° {{ habit.related_habit.time }}</small><br>
+                                <small>рџ“Ќ {{ habit.related_habit.place }}</small><br>
+                                <small>вЏ±пёЏ {{ habit.related_habit.duration }} СЃРµРєСѓРЅРґ</small>
+                            </p>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}"
+                               class="btn btn-sm btn-outline-primary">
+                                рџ“‹ РџРѕСЃРјРѕС‚СЂРµС‚СЊ РґРµС‚Р°Р»Рё
+                            </a>
+                        </div>
+
+                        {% else %}
+                        <strong>Р”Р»СЏ СЌС‚РѕР№ РїСЂРёРІС‹С‡РєРё РЅРµ РЅР°СЃС‚СЂРѕРµРЅРѕ РІРѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ</strong>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <button class="btn btn-outline-primary" disabled>вњЏпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ</button>
+                    <button class="btn btn-outline-danger" disabled>рџ—‘пёЏ РЈРґР°Р»РёС‚СЊ</button>
+                </div>
+                <div>
+                    <a href="{% url 'habits:html-habit-list' %}" class="btn btn-outline-secondary">
+                        в†ђ РќР°Р·Р°Рґ Рє СЃРїРёСЃРєСѓ
+                    </a>
+                    {% if habit.user == request.user %}
+                    <span class="badge bg-info ms-2">Р’Р°С€Р° РїСЂРёРІС‹С‡РєР°</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}РњРѕРё РїСЂРёРІС‹С‡РєРё - РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>рџ“‹ РњРѕРё РїСЂРёРІС‹С‡РєРё</h1>
+        <div>
+            <a href="{% url 'habits:api-habit-list' %}" class="btn btn-outline-info btn-sm">API</a>
+            <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createHabitModal">+ РЎРѕР·РґР°С‚СЊ РїСЂРёРІС‹С‡РєСѓ</a>
+        </div>
+    </div>
+
+    <!-- Р¤РёР»СЊС‚СЂС‹ -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">рџ”Ќ Р¤РёР»СЊС‚СЂС‹</h6>
+                    <div class="btn-group" role="group">
+                        <a href="?type=all" class="btn btn-outline-primary {% if not request.GET.type or request.GET.type == 'all' %}active{% endif %}">Р’СЃРµ</a>
+                        <a href="?type=useful" class="btn btn-outline-success {% if request.GET.type == 'useful' %}active{% endif %}">РџРѕР»РµР·РЅС‹Рµ</a>
+                        <a href="?type=pleasant" class="btn btn-outline-warning {% if request.GET.type == 'pleasant' %}active{% endif %}">РџСЂРёСЏС‚РЅС‹Рµ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if habits %}
+    <div class="row">
+        {% for habit in habits %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 {% if habit.is_pleasant %}border-warning{% else %}border-primary{% endif %}">
+                <!-- Р—Р°РіРѕР»РѕРІРѕРє РєР°СЂС‚РѕС‡РєРё - РєР»РёРєР°Р±РµР»СЊРЅС‹Р№ -->
+                <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="text-decoration-none">
+                    <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+                        <h5 class="card-title mb-0">
+                            {% if habit.is_pleasant %}рџЋЃ{% else %}рџЋЇ{% endif %}
+                            {{ habit.action }}
+                        </h5>
+                    </div>
+                </a>
+
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>вЏ° Р’СЂРµРјСЏ:</strong> {{ habit.time }}<br>
+                        <strong>рџ“Ќ РњРµСЃС‚Рѕ:</strong> {{ habit.place }}<br>
+                        <strong>рџ”„ РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ:</strong> СЂР°Р· РІ {{ habit.frequency }} РґРЅРµР№<br>
+                        <strong>вЏ±пёЏ Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ:</strong> {{ habit.duration }} СЃРµРєСѓРЅРґ
+                    </p>
+
+                    {% if not habit.is_pleasant %}
+                        {% if habit.reward %}
+                        <div class="alert alert-info mt-3">
+                            <strong>рџЋЃ Р’РѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ:</strong> {{ habit.reward }}
+                        </div>
+                        {% elif habit.related_habit %}
+                        <div class="alert alert-success mt-3">
+                            <strong>рџ”— РЎРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР°:</strong>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}" class="text-decoration-none">
+                                {{ habit.related_habit.action }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="btn btn-sm btn-info">
+                                рџ“‹ Р”РµС‚Р°Р»Рё
+                            </a>
+                            {% if habit.is_public %}
+                            <span class="badge bg-success ms-2">РџСѓР±Р»РёС‡РЅР°СЏ</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ habit.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- РџР°РіРёРЅР°С†РёСЏ -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">РќР°Р·Р°Рґ</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Р’РїРµСЂРµРґ</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <h4>рџґ РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РїСЂРёРІС‹С‡РµРє</h4>
+        <p class="text-muted">РЎРѕР·РґР°Р№С‚Рµ СЃРІРѕСЋ РїРµСЂРІСѓСЋ РїСЂРёРІС‹С‡РєСѓ Рё РЅР°С‡РЅРёС‚Рµ РјРµРЅСЏС‚СЊСЃСЏ Рє Р»СѓС‡С€РµРјСѓ!</p>
+        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createHabitModal">РЎРѕР·РґР°С‚СЊ РїРµСЂРІСѓСЋ РїСЂРёРІС‹С‡РєСѓ</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РїСЂРёРІС‹С‡РєРё (Р·Р°РіР»СѓС€РєР°) -->
+<div class="modal fade" id="createHabitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">РЎРѕР·РґР°С‚СЊ РЅРѕРІСѓСЋ РїСЂРёРІС‹С‡РєСѓ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Р¤СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ РїСЂРёРІС‹С‡РµРє Р±СѓРґРµС‚ РґРѕСЃС‚СѓРїРЅР° РІ Р±Р»РёР¶Р°Р№С€РµРј РѕР±РЅРѕРІР»РµРЅРёРё!</p>
+                <p>Рђ РїРѕРєР° РІС‹ РјРѕР¶РµС‚Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ API endpoint:</p>
+                <code>POST /habit_tracker/api/habits/</code>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}РЈРІРµРґРѕРјР»РµРЅРёСЏ - РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>рџ”” РЈРїСЂР°РІР»РµРЅРёРµ СѓРІРµРґРѕРјР»РµРЅРёСЏРјРё</h1>
+                <a href="{% url 'habits:html-habit-list' %}" class="btn btn-outline-secondary">в†ђ РќР°Р·Р°Рґ Рє РїСЂРёРІС‹С‡РєР°Рј</a>
+            </div>
+
+            <!-- РЎРѕРѕР±С‰РµРЅРёСЏ Django -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- РЎС‚Р°С‚СѓСЃ Telegram -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">рџ“± Telegram СѓРІРµРґРѕРјР»РµРЅРёСЏ</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.telegram_chat_id %}
+                    <div class="alert alert-success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="alert-heading">вњ… РђРєРєР°СѓРЅС‚ РїСЂРёРІСЏР·Р°РЅ!</h6>
+                                <p class="mb-0">
+                                    <strong>Chat ID:</strong> {{ user.telegram_chat_id }}<br>
+                                    <strong>Username:</strong> {{ user.telegram_username|default:"РќРµ СѓРєР°Р·Р°РЅ" }}
+                                </p>
+                            </div>
+                            <span class="badge bg-success fs-6">РџРѕРґРєР»СЋС‡РµРЅРѕ</span>
+                        </div>
+                    </div>
+
+                    <!-- РќР°СЃС‚СЂРѕР№РєРё СѓРІРµРґРѕРјР»РµРЅРёР№ -->
+                    <form method="post" action="{% url 'habits:toggle_notifications' %}">
+                        {% csrf_token %}
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="telegram_notifications"
+                                   id="notificationsSwitch" {% if user.telegram_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="notificationsSwitch">
+                                <strong>РџРѕР»СѓС‡Р°С‚СЊ СѓРІРµРґРѕРјР»РµРЅРёСЏ РІ Telegram</strong>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">РЎРѕС…СЂР°РЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё</button>
+                    </form>
+
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">вќЊ РђРєРєР°СѓРЅС‚ РЅРµ РїСЂРёРІСЏР·Р°РЅ</h6>
+                        <p class="mb-3">Р”Р»СЏ РїРѕР»СѓС‡РµРЅРёСЏ СѓРІРµРґРѕРјР»РµРЅРёР№ РїСЂРёРІСЏР¶РёС‚Рµ РІР°С€ Telegram Р°РєРєР°СѓРЅС‚.</p>
+
+                        <h6>рџ“‹ РљР°Рє РїСЂРёРІСЏР·Р°С‚СЊ:</h6>
+                        <ol class="mb-3">
+                            <li>РќР°Р№РґРёС‚Рµ РЅР°С€РµРіРѕ Р±РѕС‚Р° РІ Telegram</li>
+                            <li>РћС‚РїСЂР°РІСЊС‚Рµ РєРѕРјР°РЅРґСѓ <code>/start</code></li>
+                            <li>Р’РІРµРґРёС‚Рµ РІР°С€ email: <strong>{{ user.email }}</strong></li>
+                            <li>Р“РѕС‚РѕРІРѕ! Р‘РѕС‚ РїРѕРґС‚РІРµСЂРґРёС‚ РїСЂРёРІСЏР·РєСѓ</li>
+                        </ol>
+
+                        <div class="alert alert-info">
+                            <strong>РРјСЏ Р±РѕС‚Р°:</strong> @cw_useful_habits_bot
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓРІРµРґРѕРјР»РµРЅРёР№ -->
+            {% if user.telegram_chat_id %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">рџ§Є РўРµСЃС‚РёСЂРѕРІР°РЅРёРµ СѓРІРµРґРѕРјР»РµРЅРёР№</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">РџСЂРѕРІРµСЂСЊС‚Рµ, С‡С‚Рѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ СЂР°Р±РѕС‚Р°СЋС‚ РєРѕСЂСЂРµРєС‚РЅРѕ:</p>
+
+                    <!-- РџСЂРѕСЃС‚С‹Рµ С„РѕСЂРјС‹ РІРјРµСЃС‚Рѕ JavaScript -->
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Р¤РѕСЂРјР° С‚РµСЃС‚РѕРІРѕРіРѕ СѓРІРµРґРѕРјР»РµРЅРёСЏ -->
+                        <form method="post" action="{% url 'habits:send_test_notification' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary btn-lg w-100">
+                                рџ“Ё РћС‚РїСЂР°РІРёС‚СЊ С‚РµСЃС‚РѕРІРѕРµ СѓРІРµРґРѕРјР»РµРЅРёРµ
+                            </button>
+                            <small class="text-muted">РћС‚РїСЂР°РІРёС‚ РїСЂРѕСЃС‚РѕРµ С‚РµСЃС‚РѕРІРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ</small>
+                        </form>
+
+                        <!-- Р¤РѕСЂРјР° С‚РµСЃС‚Р° РїСЂРёРІС‹С‡РєРё -->
+                        <form method="post" action="{% url 'habits:test_habit_reminder' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-info btn-lg w-100 mt-2">
+                                вЏ° РўРµСЃС‚ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рѕ РїСЂРёРІС‹С‡РєРµ
+                            </button>
+                            <small class="text-muted">РћС‚РїСЂР°РІРёС‚ РЅР°РїРѕРјРёРЅР°РЅРёРµ Рѕ РїРµСЂРІРѕР№ РїСЂРёРІС‹С‡РєРµ</small>
+                        </form>
+                    </div>
+
+                    <!-- РРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РѕС‚Р»Р°РґРєРё -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6>рџ”Ќ РРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РѕС‚Р»Р°РґРєРё:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ:</strong> {{ user.username }}<br>
+                                <strong>Email:</strong> {{ user.email }}<br>
+                                <strong>Chat ID:</strong> {{ user.telegram_chat_id }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>РџСЂРёРІС‹С‡РµРє:</strong> {{ habits.count }}<br>
+                                <strong>РЈРІРµРґРѕРјР»РµРЅРёСЏ:</strong> {% if user.telegram_notifications %}Р’РєР»СЋС‡РµРЅС‹ вњ…{% else %}Р’С‹РєР»СЋС‡РµРЅС‹ вќЊ{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Р‘РѕРєРѕРІР°СЏ РїР°РЅРµР»СЊ -->
+        <div class="col-md-4">
+            <!-- РЎС‚Р°С‚СѓСЃ РїСЂРёРІС‹С‡РµРє -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">рџ“Љ Р’Р°С€Рё РїСЂРёРІС‹С‡РєРё</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="display-6 text-primary">{{ habits.count }}</div>
+                        <small class="text-muted">РІСЃРµРіРѕ РїСЂРёРІС‹С‡РµРє</small>
+                    </div>
+
+                    {% if habits %}
+                    <h6>Р‘Р»РёР¶Р°Р№С€РёРµ РЅР°РїРѕРјРёРЅР°РЅРёСЏ:</h6>
+                    <div class="list-group list-group-flush">
+                        {% for habit in habits|slice:":3" %}
+                        <div class="list-group-item px-0 py-2">
+                            <small class="text-muted">вЏ° {{ habit.time|time:"H:i" }}</small><br>
+                            <strong>{{ habit.action|truncatechars:30 }}</strong><br>
+                            <small>рџ“Ќ {{ habit.place }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if habits.count > 3 %}
+                    <div class="text-center mt-2">
+                        <small class="text-muted">Рё РµС‰Рµ {{ habits.count|add:"-3" }} РїСЂРёРІС‹С‡РµРє</small>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <p class="text-muted text-center">РЈ РІР°СЃ РїРѕРєР° РЅРµС‚ РїСЂРёРІС‹С‡РµРє</p>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'habits:html-habit-list' %}" class="btn btn-sm btn-outline-primary w-100">
+                            рџ“‹ РЈРїСЂР°РІР»РµРЅРёРµ РїСЂРёРІС‹С‡РєР°РјРё
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Р‘С‹СЃС‚СЂС‹Рµ РґРµР№СЃС‚РІРёСЏ -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">вљЎ Р‘С‹СЃС‚СЂС‹Рµ РґРµР№СЃС‚РІРёСЏ</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.telegram_chat_id %}
+                        <a href="https://t.me/cw_useful_habits_bot" target="_blank" class="btn btn-success btn-sm">
+                            рџ’¬ РћС‚РєСЂС‹С‚СЊ Р±РѕС‚Р° РІ Telegram
+                        </a>
+                        {% endif %}
+
+                        <a href="{% url 'habits:html-public-habits' %}" class="btn btn-outline-secondary btn-sm">
+                            рџЊЌ РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё
+                        </a>
+
+                        <a href="{% url 'user:profile_edit' %}" class="btn btn-outline-info btn-sm">
+                            вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё РїСЂРѕС„РёР»СЏ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% extends "base.html" %}
+{% block title %}РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё - РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>рџЊЌ РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё</h1>
+        <a href="{% url 'habits:api-public-habits' %}" class="btn btn-outline-info btn-sm">API</a>
+    </div>
+
+    <!-- Р¤РёР»СЊС‚СЂС‹ -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">рџ”Ќ Р¤РёР»СЊС‚СЂС‹</h6>
+                    <div class="btn-group" role="group">
+                        <a href="?type=all" class="btn btn-outline-primary {% if not request.GET.type or request.GET.type == 'all' %}active{% endif %}">Р’СЃРµ</a>
+                        <a href="?type=useful" class="btn btn-outline-success {% if request.GET.type == 'useful' %}active{% endif %}">РџРѕР»РµР·РЅС‹Рµ</a>
+                        <a href="?type=pleasant" class="btn btn-outline-warning {% if request.GET.type == 'pleasant' %}active{% endif %}">РџСЂРёСЏС‚РЅС‹Рµ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if habits %}
+    <div class="row">
+        {% for habit in habits %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 {% if habit.is_pleasant %}border-warning{% else %}border-primary{% endif %}">
+                <!-- Р—Р°РіРѕР»РѕРІРѕРє РєР°СЂС‚РѕС‡РєРё - РєР»РёРєР°Р±РµР»СЊРЅС‹Р№ -->
+                <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="text-decoration-none">
+                    <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+                        <h5 class="card-title mb-0">
+                            {% if habit.is_pleasant %}рџЋЃ{% else %}рџЋЇ{% endif %}
+                            {{ habit.action }}
+                        </h5>
+                        <small class="text-muted">рџ‘¤ {{ habit.user.username }}</small>
+                    </div>
+                </a>
+
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>вЏ° Р’СЂРµРјСЏ:</strong> {{ habit.time }}<br>
+                        <strong>рџ“Ќ РњРµСЃС‚Рѕ:</strong> {{ habit.place }}<br>
+                        <strong>рџ”„ РџРµСЂРёРѕРґРёС‡РЅРѕСЃС‚СЊ:</strong> СЂР°Р· РІ {{ habit.frequency }} РґРЅРµР№<br>
+                        <strong>вЏ±пёЏ Р”Р»РёС‚РµР»СЊРЅРѕСЃС‚СЊ:</strong> {{ habit.duration }} СЃРµРєСѓРЅРґ
+                    </p>
+
+                    {% if not habit.is_pleasant %}
+                        {% if habit.reward %}
+                        <div class="alert alert-info mt-3">
+                            <strong>рџЋЃ Р’РѕР·РЅР°РіСЂР°Р¶РґРµРЅРёРµ:</strong> {{ habit.reward }}
+                        </div>
+                        {% elif habit.related_habit %}
+                        <div class="alert alert-success mt-3">
+                            <strong>рџ”— РЎРІСЏР·Р°РЅРЅР°СЏ РїСЂРёРІС‹С‡РєР°:</strong>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}" class="text-decoration-none">
+                                {{ habit.related_habit.action }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="btn btn-sm btn-info">
+                            рџ“‹ Р”РµС‚Р°Р»Рё
+                        </a>
+                        <small class="text-muted">РЎРѕР·РґР°РЅР°: {{ habit.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <h4>рџ¤·вЂЌв™‚пёЏ РџСѓР±Р»РёС‡РЅС‹С… РїСЂРёРІС‹С‡РµРє РїРѕРєР° РЅРµС‚</h4>
+        <p class="text-muted">Р‘СѓРґСЊС‚Рµ РїРµСЂРІС‹Рј, РєС‚Рѕ РїРѕРґРµР»РёС‚СЃСЏ СЃРІРѕРµР№ РїРѕР»РµР·РЅРѕР№ РїСЂРёРІС‹С‡РєРѕР№!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+<footer class="bg-dark text-light mt-5 py-4">
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <h5>LMS System</h5>
-                <p>Р’Р°С€Р° РїР»Р°С‚С„РѕСЂРјР° РґР»СЏ РѕРЅР»Р°Р№РЅ-РѕР±СѓС‡РµРЅРёСЏ</p>
+                <h5>РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє</h5>
+                <p>Р’Р°С€ РїРѕРјРѕС‰РЅРёРє РЅР° РїСѓС‚Рё Рє Р»СѓС‡С€РµР№ РІРµСЂСЃРёРё СЃРµР±СЏ</p>
             </div>
             <div class="col-md-6 text-end">
-                <p>&copy; 2025 Learning Management System. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.</p>
+                <p>&copy; 2025 РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє. Р’СЃРµ РїСЂР°РІР° Р·Р°С‰РёС‰РµРЅС‹.</p>
             </div>
         </div>
     </div>
 </footer>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" href="/">пёЏ LMS System</a>
+        <a class="navbar-brand" href="/">рџЏ† РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє</a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -24,77 +571,73 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Р“Р»Р°РІРЅР°СЏ</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'courses:course-list' %}">РљСѓСЂСЃС‹ (API)</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'courses:lessons_list' %}">РЈСЂРѕРєРё (API)</a>
-                </li>
-
-                <!-- РљРЅРѕРїРєРё С‚РѕР»СЊРєРѕ РґР»СЏ РјРµРЅРµРґР¶РµСЂРѕРІ Рё Р°РґРјРёРЅРѕРІ -->
-                {% if user.is_authenticated and user.role == 'manager' or user.is_staff %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        рџ› пёЏ РЈРїСЂР°РІР»РµРЅРёРµ
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="/users/manager/users/html/">
-                                рџ‘Ґ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/users/api/users/">
-                                рџ“Љ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё (API)
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="/admin/">
-                                вљ™пёЏ РђРґРјРёРЅРєР°
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:html-habit-list' %}">РњРѕРё РїСЂРёРІС‹С‡РєРё</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:html-public-habits' %}">РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё</a>
+                    </li>
+                    <!-- Р”РћР‘РђР’Р›РЇР•Рњ РЎРЎР«Р›РљРЈ РќРђ РЈР’Р•Р”РћРњР›Р•РќРРЇ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:notifications' %}">
+                            рџ”” РЈРІРµРґРѕРјР»РµРЅРёСЏ
+                            {% if user.telegram_chat_id %}
+                                <span class="badge bg-success">РџРѕРґРєР»СЋС‡РµРЅРѕ</span>
+                            {% else %}
+                                <span class="badge bg-warning">РћС‚РєР»СЋС‡РµРЅРѕ</span>
+                            {% endif %}
+                        </a>
+                    </li>
                 {% endif %}
             </ul>
 
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                        рџ‘¤ {{ user.username }}
-                        {% if user.role == 'manager' or user.is_staff %}
-                        <span class="badge bg-warning">Staff</span>
-                        {% endif %}
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="/users/api/profile/">
-                                рџ“ќ РњРѕР№ РїСЂРѕС„РёР»СЊ (API)
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="/users/api/profile/update/">
-                                вњЏпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ РїСЂРѕС„РёР»СЊ
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form method="post" action="{% url 'user:logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="dropdown-item">рџљЄ Р’С‹Р№С‚Рё</button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            рџ‘¤ {{ user.username }}
+                            {% if user.role == 'manager' or user.is_staff %}
+                                <span class="badge bg-warning">Staff</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user:profile_edit' %}">
+                                    рџ“ќ РњРѕР№ РїСЂРѕС„РёР»СЊ
+                                </a>
+                            </li>
+                            {% if user.role == 'manager' or user.is_staff %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'user:user_list' %}">
+                                        рџ‘Ґ РџРѕР»СЊР·РѕРІР°С‚РµР»Рё
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/">
+                                        вљ™пёЏ РђРґРјРёРЅРєР°
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'user:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">рџљЄ Р’С‹Р№С‚Рё</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
                 {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/users/login/">Р’РѕР№С‚Рё</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/users/register/">Р РµРіРёСЃС‚СЂР°С†РёСЏ</a>
-                </li>
+                    <!-- РљРќРћРџРљР Р”Р›РЇ РќР•РђР’РўРћР РР—РћР’РђРќРќР«РҐ РџРћР›Р¬Р—РћР’РђРўР•Р›Р•Р™ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:login' %}">Р’РѕР№С‚Рё</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="{% url 'user:register' %}" role="button">Р РµРіРёСЃС‚СЂР°С†РёСЏ</a>
+                    </li>
                 {% endif %}
             </ul>
         </div>
@@ -105,7 +648,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}LMS - Learning Management System{% endblock %}</title>
+    <title>{% block title %}РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}</title>
     {% load static %}
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
@@ -136,21 +679,67 @@
 </body>
 </html>
 {% extends "base.html" %}
-{% block title %}Р“Р»Р°РІРЅР°СЏ - LMS{% endblock %}
+{% block title %}Р“Р»Р°РІРЅР°СЏ - РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="jumbotron bg-light p-5 rounded">
-        <h1 class="display-4">Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ Learning Management System!</h1>
-        <p class="lead">Р’Р°С€Р° РїР»Р°С‚С„РѕСЂРјР° РґР»СЏ РѕРЅР»Р°Р№РЅ-РѕР±СѓС‡РµРЅРёСЏ</p>
+        <h1 class="display-4">Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ РІ РўСЂРµРєРµСЂ РџСЂРёРІС‹С‡РµРє! рџљЂ</h1>
+        <p class="lead">РЎРѕР·РґР°РІР°Р№ РїРѕР»РµР·РЅС‹Рµ РїСЂРёРІС‹С‡РєРё, РѕС‚СЃР»РµР¶РёРІР°Р№ СЃРІРѕР№ РїСЂРѕРіСЂРµСЃСЃ Рё СЃС‚Р°РЅРѕРІРёСЃСЊ Р»СѓС‡С€Рµ СЃ РєР°Р¶РґС‹Рј РґРЅРµРј.</p>
         <hr class="my-4">
-        <p>РР·СѓС‡Р°Р№С‚Рµ РєСѓСЂСЃС‹, РїСЂРѕС…РѕРґРёС‚Рµ СѓСЂРѕРєРё Рё РѕС‚СЃР»РµР¶РёРІР°Р№С‚Рµ СЃРІРѕР№ РїСЂРѕРіСЂРµСЃСЃ</p>
+        <p>РќР°С€Р° РїР»Р°С‚С„РѕСЂРјР° РїРѕРјРѕР¶РµС‚ С‚РµР±Рµ РІС‹СЂР°Р±РѕС‚Р°С‚СЊ СЂРёС‚Рј, РїРѕР»СѓС‡Р°С‚СЊ РЅР°РїРѕРјРёРЅР°РЅРёСЏ Рё Р°РЅР°Р»РёР·РёСЂРѕРІР°С‚СЊ СЃРІРѕРё СѓСЃРїРµС…Рё.</p>
         {% if not user.is_authenticated %}
-        <a class="btn btn-primary btn-lg" href="{% url 'user:register' %}" role="button">РќР°С‡Р°С‚СЊ РѕР±СѓС‡РµРЅРёРµ</a>
+        <a class="btn btn-primary btn-lg me-2" href="{% url 'user:register' %}" role="button">РќР°С‡Р°С‚СЊ РјРµРЅСЏС‚СЊСЃСЏ</a>
+        <a class="btn btn-outline-secondary btn-lg" href="{% url 'user:login' %}" role="button">Р’РѕР№С‚Рё</a>
         {% else %}
-        <a class="btn btn-success btn-lg" href="{% url 'courses:course-list' %}" role="button">Рљ РєСѓСЂСЃР°Рј (API)</a>
-        <a class="btn btn-info btn-lg ms-2" href="{% url 'courses:lessons_list' %}" role="button">Рљ СѓСЂРѕРєР°Рј (API)</a>
+        <div class="btn-group" role="group">
+            <a class="btn btn-success btn-lg" href="{% url 'habits:html-habit-list' %}" role="button">РњРѕРё РїСЂРёРІС‹С‡РєРё</a>
+            <a class="btn btn-info btn-lg" href="{% url 'habits:html-public-habits' %}" role="button">РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё</a>
+        </div>
+        <div class="mt-3">
+            <div class="dropdown">
+                <button class="btn btn-outline-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    рџ”Њ API Endpoints
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'habits:api-habit-list' %}">РњРѕРё РїСЂРёРІС‹С‡РєРё (API)</a></li>
+                    <li><a class="dropdown-item" href="{% url 'habits:api-public-habits' %}">РџСѓР±Р»РёС‡РЅС‹Рµ РїСЂРёРІС‹С‡РєРё (API)</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/api/token/">РџРѕР»СѓС‡РёС‚СЊ JWT С‚РѕРєРµРЅ</a></li>
+                </ul>
+            </div>
+        </div>
         {% endif %}
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">рџ“‹</h5>
+                    <h5 class="card-title">РЎРѕР·РґР°РІР°Р№</h5>
+                    <p class="card-text">РћРїСЂРµРґРµР»Рё С†РµР»СЊ, С‡Р°СЃС‚РѕС‚Сѓ Рё РІСЂРµРјСЏ РґР»СЏ СЃРІРѕРёС… РїРѕР»РµР·РЅС‹С… РїСЂРёРІС‹С‡РµРє.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">рџ””</h5>
+                    <h5 class="card-title">РћС‚СЃР»РµР¶РёРІР°Р№</h5>
+                    <p class="card-text">РџРѕР»СѓС‡Р°Р№ СѓРІРµРґРѕРјР»РµРЅРёСЏ Рё РѕС‚РјРµС‡Р°Р№ РІС‹РїРѕР»РЅРµРЅРёРµ РєР°Р¶РґРѕРіРѕ С€Р°РіР°.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">рџ“€</h5>
+                    <h5 class="card-title">РђРЅР°Р»РёР·РёСЂСѓР№</h5>
+                    <p class="card-text">РЎРјРѕС‚СЂРё РЅР° СЃРІРѕСЋ СЃС‚Р°С‚РёСЃС‚РёРєСѓ Рё РјРѕС‚РёРІРёСЂСѓР№ СЃРµР±СЏ РЅР° РЅРѕРІС‹Рµ СЃРІРµСЂС€РµРЅРёСЏ.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

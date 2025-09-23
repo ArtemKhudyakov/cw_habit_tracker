@@ -14,6 +14,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("email", "country", "phone", "avatar")}),
+        (_("Telegram settings"), {"fields": ("telegram_chat_id", "telegram_username", "telegram_notifications")}),
         (
             _("Permissions"),
             {
