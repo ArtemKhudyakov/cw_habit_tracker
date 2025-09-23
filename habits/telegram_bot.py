@@ -1,9 +1,10 @@
 import logging
-from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-from django.conf import settings
+
 from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from telegram import Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ class HabitTrackerBot:
     def get_user_habits(self, user):
         """Асинхронно получаем привычки пользователя"""
         from .models import Habit  # Локальный импорт чтобы избежать циклических импортов
+
         return list(Habit.objects.filter(user=user, is_pleasant=False))
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -93,7 +95,7 @@ class HabitTrackerBot:
 
 💡 *Для привязки аккаунта просто введите ваш email*
         """
-        await update.message.reply_text(help_text, parse_mode='Markdown')
+        await update.message.reply_text(help_text, parse_mode="Markdown")
 
     async def my_habits(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Показать привычки пользователя"""
@@ -101,9 +103,7 @@ class HabitTrackerBot:
 
         user = await self.get_user_by_chat_id(chat_id)
         if not user:
-            await update.message.reply_text(
-                "❌ Ваш аккаунт не привязан. Введите ваш email для привязки."
-            )
+            await update.message.reply_text("❌ Ваш аккаунт не привязан. Введите ваш email для привязки.")
             return
 
         habits = await self.get_user_habits(user)
@@ -118,7 +118,7 @@ class HabitTrackerBot:
         else:
             message = "У вас пока нет привычек. Создайте их на сайте! 🌟"
 
-        await update.message.reply_text(message, parse_mode='Markdown')
+        await update.message.reply_text(message, parse_mode="Markdown")
 
     async def toggle_notifications(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Включить/выключить уведомления"""
@@ -126,9 +126,7 @@ class HabitTrackerBot:
 
         user = await self.get_user_by_chat_id(chat_id)
         if not user:
-            await update.message.reply_text(
-                "❌ Ваш аккаунт не привязан. Введите ваш email для привязки."
-            )
+            await update.message.reply_text("❌ Ваш аккаунт не привязан. Введите ваш email для привязки.")
             return
 
         user.telegram_notifications = not user.telegram_notifications
@@ -147,7 +145,7 @@ class HabitTrackerBot:
         telegram_username = update.effective_user.username
 
         # Проверяем, является ли сообщение email'ом
-        if '@' in text and ' ' not in text:  # Простая проверка на email
+        if "@" in text and " " not in text:  # Простая проверка на email
             # Проверяем, не привязан ли уже этот chat_id
             existing_user = await self.get_user_by_chat_id(chat_id)
             if existing_user:

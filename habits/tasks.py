@@ -1,8 +1,9 @@
 import logging
-from django.conf import settings
-from django.contrib.auth import get_user_model
+
 import requests
 from celery import shared_task
+from django.conf import settings
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -25,11 +26,7 @@ def send_habit_reminder(chat_id, message):
     logger.info("✅ TELEGRAM_BOT_TOKEN найден")
 
     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {
-        'chat_id': chat_id,
-        'text': message,
-        'parse_mode': 'HTML'
-    }
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
 
     logger.info(f"URL: {url}")
     logger.info(f"Payload: {payload}")
@@ -55,8 +52,9 @@ def send_habit_reminder(chat_id, message):
 @shared_task
 def send_habit_reminder_task(habit_id):
     """Celery задача для отправки напоминания о привычке"""
-    from .models import Habit
     from django.contrib.auth import get_user_model
+
+    from .models import Habit
 
     User = get_user_model()
 
@@ -135,12 +133,14 @@ def send_test_notification():
 @shared_task
 def check_and_send_habit_reminders():
     """Периодическая задача для проверки и отправки напоминаний о привычках"""
-    from django.utils import timezone
-    from .models import Habit
-    from django.contrib.auth import get_user_model
-    import pytz
     import logging
     from datetime import datetime, time
+
+    import pytz
+    from django.contrib.auth import get_user_model
+    from django.utils import timezone
+
+    from .models import Habit
 
     logger = logging.getLogger(__name__)
     User = get_user_model()
@@ -148,7 +148,7 @@ def check_and_send_habit_reminders():
     logger.info("=== 🔍 ЗАПУСК ПРОВЕРКИ НАПОМИНАНИЙ О ПРИВЫЧКАХ ===")
 
     # Текущее время в Москве
-    moscow_tz = pytz.timezone('Europe/Moscow')
+    moscow_tz = pytz.timezone("Europe/Moscow")
     now_moscow = timezone.now().astimezone(moscow_tz)
     current_time_moscow = now_moscow.time()
 
@@ -170,8 +170,10 @@ def check_and_send_habit_reminders():
             habit_time_moscow = habit.time
 
             # Сравниваем время
-            time_diff = abs((current_time_moscow.hour * 60 + current_time_moscow.minute) -
-                            (habit_time_moscow.hour * 60 + habit_time_moscow.minute))
+            time_diff = abs(
+                (current_time_moscow.hour * 60 + current_time_moscow.minute)
+                - (habit_time_moscow.hour * 60 + habit_time_moscow.minute)
+            )
 
             logger.info(f"Проверка: {habit.action} в {habit_time_moscow}")
             logger.info(f"Разница с текущим {current_time_moscow}: {time_diff} мин")

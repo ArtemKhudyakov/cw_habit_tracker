@@ -12,20 +12,16 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView
-from .mixins import ManagerRequiredMixin
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 
 from .forms import UserProfileForm, UserRegistrationForm
+from .mixins import ManagerRequiredMixin
 from .models import User
 from .permissions import CanEditUserProfile, CanViewUserList
-from .serializers import (
-    UserApiRegistrationSerializer,
-    UserPrivateProfileSerializer,
-    UserPublicProfileSerializer
-)
+from .serializers import UserApiRegistrationSerializer, UserPrivateProfileSerializer, UserPublicProfileSerializer
 
 
 class CustomLogoutView(LogoutView):
@@ -111,6 +107,7 @@ def toggle_user_block(request, user_id):
     messages.success(request, f"Пользователь {user.email} {'заблокирован' if user.is_blocked else 'разблокирован'}")
     return redirect("user:user_list")
 
+
 class UserListHTMLView(ManagerRequiredMixin, TemplateView):
     """HTML страница списка пользователей"""
 
@@ -121,6 +118,7 @@ class UserListHTMLView(ManagerRequiredMixin, TemplateView):
         context["users"] = User.objects.all().order_by("-date_joined")
         return context
 
+
 class UserCreateApiView(generics.CreateAPIView):
     serializer_class = UserApiRegistrationSerializer
     queryset = User.objects.all()
@@ -130,6 +128,7 @@ class UserCreateApiView(generics.CreateAPIView):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()
+
 
 class UserProfileUpdateAPIView(generics.UpdateAPIView):
     """
@@ -210,4 +209,3 @@ class UserListAPIView(generics.ListAPIView):
             raise DRFPermissionDenied("Только менеджеры и администраторы могут просматривать список пользователей")
 
         return User.objects.all().order_by("-date_joined")
-

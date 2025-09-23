@@ -43,7 +43,6 @@ class User(AbstractUser):
         help_text="Введите номер телефона",
     )
 
-
     avatar = models.ImageField(
         upload_to="user/avatars",
         blank=True,
@@ -65,18 +64,11 @@ class User(AbstractUser):
         null=True,
         unique=True,
         verbose_name="ID чата в Telegram",
-        help_text="Уникальный идентификатор чата для Telegram уведомлений"
+        help_text="Уникальный идентификатор чата для Telegram уведомлений",
     )
-    telegram_username = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name="Username в Telegram"
-    )
+    telegram_username = models.CharField(max_length=100, blank=True, null=True, verbose_name="Username в Telegram")
     telegram_notifications = models.BooleanField(
-        default=True,
-        verbose_name="Telegram уведомления",
-        help_text="Включены ли уведомления в Telegram"
+        default=True, verbose_name="Telegram уведомления", help_text="Включены ли уведомления в Telegram"
     )
 
     ROLES = (("user", "Пользователь"), ("manager", "Менеджер"))
@@ -98,27 +90,15 @@ class User(AbstractUser):
 
 class TelegramUser(models.Model):
     """Модель для хранения Telegram пользователей"""
+
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='telegram',
-        verbose_name="Пользователь"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="telegram", verbose_name="Пользователь"
     )
     chat_id = models.BigIntegerField(
-        unique=True,
-        verbose_name="ID чата в Telegram",
-        help_text="Уникальный идентификатор чата с пользователем"
+        unique=True, verbose_name="ID чата в Telegram", help_text="Уникальный идентификатор чата с пользователем"
     )
-    username = models.CharField(
-        max_length=100,
-        blank=True,
-        null=True,
-        verbose_name="Username в Telegram"
-    )
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Активен"
-    )
+    username = models.CharField(max_length=100, blank=True, null=True, verbose_name="Username в Telegram")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата подключения")
 
     class Meta:

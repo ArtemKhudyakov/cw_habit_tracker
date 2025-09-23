@@ -1,16 +1,18 @@
-from django.core.management.base import BaseCommand
-from habits.telegram_bot import HabitTrackerBot
-import logging
 import asyncio
+import logging
+
+from django.core.management.base import BaseCommand
+
+from habits.telegram_bot import HabitTrackerBot
 
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
-    help = 'Запуск Telegram бота для трекера привычек'
+    help = "Запуск Telegram бота для трекера привычек"
 
     def handle(self, *args, **options):
-        self.stdout.write('Starting Telegram bot...')
+        self.stdout.write("Starting Telegram bot...")
 
         try:
             bot = HabitTrackerBot()
@@ -26,4 +28,4 @@ class Command(BaseCommand):
 
         except Exception as e:
             logger.error(f"Bot error: {e}")
-            self.stdout.write(self.style.ERROR(f'Bot error: {e}'))
+            self.stdout.write(self.style.ERROR(f"Bot error: {e}"))
