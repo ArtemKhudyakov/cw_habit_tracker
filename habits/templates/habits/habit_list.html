@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Мои привычки - Трекер Привычек{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>📋 Мои привычки</h1>
+        <div>
+            <a href="{% url 'habits:api-habit-list' %}" class="btn btn-outline-info btn-sm">API</a>
+            <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createHabitModal">+ Создать привычку</a>
+        </div>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">🔍 Фильтры</h6>
+                    <div class="btn-group" role="group">
+                        <a href="?type=all" class="btn btn-outline-primary {% if not request.GET.type or request.GET.type == 'all' %}active{% endif %}">Все</a>
+                        <a href="?type=useful" class="btn btn-outline-success {% if request.GET.type == 'useful' %}active{% endif %}">Полезные</a>
+                        <a href="?type=pleasant" class="btn btn-outline-warning {% if request.GET.type == 'pleasant' %}active{% endif %}">Приятные</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if habits %}
+    <div class="row">
+        {% for habit in habits %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 {% if habit.is_pleasant %}border-warning{% else %}border-primary{% endif %}">
+                <!-- Заголовок карточки - кликабельный -->
+                <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="text-decoration-none">
+                    <div class="card-header {% if habit.is_pleasant %}bg-warning{% else %}bg-primary text-white{% endif %}">
+                        <h5 class="card-title mb-0">
+                            {% if habit.is_pleasant %}🎁{% else %}🎯{% endif %}
+                            {{ habit.action }}
+                        </h5>
+                    </div>
+                </a>
+
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>⏰ Время:</strong> {{ habit.time }}<br>
+                        <strong>📍 Место:</strong> {{ habit.place }}<br>
+                        <strong>🔄 Периодичность:</strong> раз в {{ habit.frequency }} дней<br>
+                        <strong>⏱️ Длительность:</strong> {{ habit.duration }} секунд
+                    </p>
+
+                    {% if not habit.is_pleasant %}
+                        {% if habit.reward %}
+                        <div class="alert alert-info mt-3">
+                            <strong>🎁 Вознаграждение:</strong> {{ habit.reward }}
+                        </div>
+                        {% elif habit.related_habit %}
+                        <div class="alert alert-success mt-3">
+                            <strong>🔗 Связанная привычка:</strong>
+                            <a href="{% url 'habits:html-habit-detail' habit.related_habit.pk %}" class="text-decoration-none">
+                                {{ habit.related_habit.action }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{% url 'habits:html-habit-detail' habit.pk %}" class="btn btn-sm btn-info">
+                                📋 Детали
+                            </a>
+                            {% if habit.is_public %}
+                            <span class="badge bg-success ms-2">Публичная</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ habit.created_at|date:"d.m.Y" }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Пагинация -->
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Назад</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?page={{ num }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">{{ num }}</a></li>
+            {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}">Вперед</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+        <h4>😴 У вас пока нет привычек</h4>
+        <p class="text-muted">Создайте свою первую привычку и начните меняться к лучшему!</p>
+        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createHabitModal">Создать первую привычку</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Модальное окно для создания привычки (заглушка) -->
+<div class="modal fade" id="createHabitModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Создать новую привычку</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Функция создания привычек будет доступна в ближайшем обновлении!</p>
+                <p>А пока вы можете использовать API endpoint:</p>
+                <code>POST /habit_tracker/api/habits/</code>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

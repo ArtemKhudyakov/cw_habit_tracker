@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Уведомления - Трекер Привычек{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>🔔 Управление уведомлениями</h1>
+                <a href="{% url 'habits:html-habit-list' %}" class="btn btn-outline-secondary">← Назад к привычкам</a>
+            </div>
+
+            <!-- Сообщения Django -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Статус Telegram -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">📱 Telegram уведомления</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.telegram_chat_id %}
+                    <div class="alert alert-success">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="alert-heading">✅ Аккаунт привязан!</h6>
+                                <p class="mb-0">
+                                    <strong>Chat ID:</strong> {{ user.telegram_chat_id }}<br>
+                                    <strong>Username:</strong> {{ user.telegram_username|default:"Не указан" }}
+                                </p>
+                            </div>
+                            <span class="badge bg-success fs-6">Подключено</span>
+                        </div>
+                    </div>
+
+                    <!-- Настройки уведомлений -->
+                    <form method="post" action="{% url 'habits:toggle_notifications' %}">
+                        {% csrf_token %}
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="telegram_notifications"
+                                   id="notificationsSwitch" {% if user.telegram_notifications %}checked{% endif %}>
+                            <label class="form-check-label" for="notificationsSwitch">
+                                <strong>Получать уведомления в Telegram</strong>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+                    </form>
+
+                    {% else %}
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">❌ Аккаунт не привязан</h6>
+                        <p class="mb-3">Для получения уведомлений привяжите ваш Telegram аккаунт.</p>
+
+                        <h6>📋 Как привязать:</h6>
+                        <ol class="mb-3">
+                            <li>Найдите нашего бота в Telegram</li>
+                            <li>Отправьте команду <code>/start</code></li>
+                            <li>Введите ваш email: <strong>{{ user.email }}</strong></li>
+                            <li>Готово! Бот подтвердит привязку</li>
+                        </ol>
+
+                        <div class="alert alert-info">
+                            <strong>Имя бота:</strong> @cw_useful_habits_bot
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Тестирование уведомлений -->
+            {% if user.telegram_chat_id %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">🧪 Тестирование уведомлений</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Проверьте, что уведомления работают корректно:</p>
+
+                    <!-- Простые формы вместо JavaScript -->
+                    <div class="d-flex flex-column gap-2">
+                        <!-- Форма тестового уведомления -->
+                        <form method="post" action="{% url 'habits:send_test_notification' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-primary btn-lg w-100">
+                                📨 Отправить тестовое уведомление
+                            </button>
+                            <small class="text-muted">Отправит простое тестовое сообщение</small>
+                        </form>
+
+                        <!-- Форма теста привычки -->
+                        <form method="post" action="{% url 'habits:test_habit_reminder' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-info btn-lg w-100 mt-2">
+                                ⏰ Тест напоминания о привычке
+                            </button>
+                            <small class="text-muted">Отправит напоминание о первой привычке</small>
+                        </form>
+                    </div>
+
+                    <!-- Информация для отладки -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6>🔍 Информация для отладки:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Пользователь:</strong> {{ user.username }}<br>
+                                <strong>Email:</strong> {{ user.email }}<br>
+                                <strong>Chat ID:</strong> {{ user.telegram_chat_id }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Привычек:</strong> {{ habits.count }}<br>
+                                <strong>Уведомления:</strong> {% if user.telegram_notifications %}Включены ✅{% else %}Выключены ❌{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="col-md-4">
+            <!-- Статус привычек -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">📊 Ваши привычки</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="display-6 text-primary">{{ habits.count }}</div>
+                        <small class="text-muted">всего привычек</small>
+                    </div>
+
+                    {% if habits %}
+                    <h6>Ближайшие напоминания:</h6>
+                    <div class="list-group list-group-flush">
+                        {% for habit in habits|slice:":3" %}
+                        <div class="list-group-item px-0 py-2">
+                            <small class="text-muted">⏰ {{ habit.time|time:"H:i" }}</small><br>
+                            <strong>{{ habit.action|truncatechars:30 }}</strong><br>
+                            <small>📍 {{ habit.place }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if habits.count > 3 %}
+                    <div class="text-center mt-2">
+                        <small class="text-muted">и еще {{ habits.count|add:"-3" }} привычек</small>
+                    </div>
+                    {% endif %}
+
+                    {% else %}
+                    <p class="text-muted text-center">У вас пока нет привычек</p>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'habits:html-habit-list' %}" class="btn btn-sm btn-outline-primary w-100">
+                            📋 Управление привычками
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Быстрые действия -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">⚡ Быстрые действия</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        {% if user.telegram_chat_id %}
+                        <a href="https://t.me/cw_useful_habits_bot" target="_blank" class="btn btn-success btn-sm">
+                            💬 Открыть бота в Telegram
+                        </a>
+                        {% endif %}
+
+                        <a href="{% url 'habits:html-public-habits' %}" class="btn btn-outline-secondary btn-sm">
+                            🌍 Публичные привычки
+                        </a>
+
+                        <a href="{% url 'user:profile_edit' %}" class="btn btn-outline-info btn-sm">
+                            ⚙️ Настройки профиля
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
