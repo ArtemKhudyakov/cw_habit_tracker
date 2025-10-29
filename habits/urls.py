@@ -10,7 +10,7 @@ from .views import (
     PublicHabitsHTMLView,
     SendTestNotificationView,
     TestHabitReminderView,
-    ToggleNotificationsView,
+    ToggleNotificationsView
 )
 
 app_name = "habits"

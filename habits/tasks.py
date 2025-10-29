@@ -133,6 +133,7 @@ def send_test_notification():
 def check_and_send_habit_reminders():
     """Периодическая задача для проверки и отправки напоминаний о привычках"""
     import logging
+
     import pytz
     from django.utils import timezone
 

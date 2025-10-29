@@ -16,7 +16,7 @@ from .views import (
     UserProfileUpdateView,
     UserRegisterView,
     email_verification,
-    toggle_user_block,
+    toggle_user_block
 )
 
 app_name = "user"
