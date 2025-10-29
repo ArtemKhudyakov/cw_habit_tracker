@@ -1,0 +1,85 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🏆 Трекер Привычек</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Главная</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:html-habit-list' %}">Мои привычки</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:html-public-habits' %}">Публичные привычки</a>
+                    </li>
+                    <!-- ДОБАВЛЯЕМ ССЫЛКУ НА УВЕДОМЛЕНИЯ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'habits:notifications' %}">
+                            🔔 Уведомления
+                            {% if user.telegram_chat_id %}
+                                <span class="badge bg-success">Подключено</span>
+                            {% else %}
+                                <span class="badge bg-warning">Отключено</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            👤 {{ user.username }}
+                            {% if user.role == 'manager' or user.is_staff %}
+                                <span class="badge bg-warning">Staff</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'user:profile_edit' %}">
+                                    📝 Мой профиль
+                                </a>
+                            </li>
+                            {% if user.role == 'manager' or user.is_staff %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'user:user_list' %}">
+                                        👥 Пользователи
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/">
+                                        ⚙️ Админка
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <form method="post" action="{% url 'user:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">🚪 Выйти</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <!-- КНОПКИ ДЛЯ НЕАВТОРИЗОВАННЫХ ПОЛЬЗОВАТЕЛЕЙ -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user:login' %}">Войти</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="{% url 'user:register' %}" role="button">Регистрация</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

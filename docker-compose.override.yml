@@ -1,0 +1,9 @@
+services:
+  web:
+    env_file: .env.docker
+  db:
+    env_file: .env.docker
+  celery:
+    env_file: .env.docker
+  celery-beat:
+    env_file: .env.docker
