@@ -35,7 +35,7 @@ class Command(BaseCommand):
                 "place": "Диван",
                 "time": time(20, 30),
                 "frequency": 1,
-                "duration": 600,
+                "duration": 120,
                 "is_pleasant": True,
             },
             {
@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 "place": "Ванная комната",
                 "time": time(21, 0),
                 "frequency": 2,
-                "duration": 1800,
+                "duration": 120,
                 "is_pleasant": True,
             },
             {
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 "place": "Парк",
                 "time": time(18, 30),
                 "frequency": 1,
-                "duration": 1800,
+                "duration": 120,
                 "is_pleasant": True,
             },
         ]
@@ -204,8 +204,12 @@ class Command(BaseCommand):
 
             if has_related:
                 habit_data["related_habit"] = random.choice(pleasant_habits)
+                habit_data["reward"] = None  # ✅ Явно убираем reward при наличии related_habit
             else:
                 habit_data["reward"] = data["reward"]
+                habit_data["related_habit"] = None  # ✅ Явно убираем related_habit при наличии reward
+
+            habit = Habit.objects.create(**habit_data)
 
             habit = Habit.objects.create(**habit_data)
             created_count += 1

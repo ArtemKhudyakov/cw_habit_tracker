@@ -16,7 +16,10 @@ dependencies = [
     "python-telegram-bot (>=22.4,<23.0)",
     "celery (>=5.5.3,<6.0.0)",
     "redis (>=6.4.0,<7.0.0)",
-    "django-cors-headers (>=4.9.0,<5.0.0)"
+    "django-cors-headers (>=4.9.0,<5.0.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
+    "whitenoise (>=6.11.0,<7.0.0)"
 ]
 
 
@@ -34,7 +37,6 @@ mypy = "^1.18.1"
 [tool.poetry.group.dev.dependencies]
 pillow = "^11.3.0"
 dotenv = "^0.9.9"
-psycopg2 = "^2.9.10"
 psycopg2-binary = "^2.9.10"
 autopep8 = "^2.3.2"
 ipython = "^9.5.0"
