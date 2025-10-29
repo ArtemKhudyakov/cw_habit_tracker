@@ -1,8 +1,6 @@
-import json
-
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
@@ -13,7 +11,6 @@ from rest_framework.filters import OrderingFilter
 from .models import Habit
 from .permissions import IsOwner
 from .serializers import HabitSerializer, PublicHabitSerializer
-from .tasks import send_test_notification
 
 
 # API Views
@@ -153,7 +150,6 @@ class SendTestNotificationView(LoginRequiredMixin, View):
 
 class TestHabitReminderView(LoginRequiredMixin, View):
     def post(self, request):
-        from .tasks import send_habit_reminder_task
 
         if not request.user.telegram_chat_id:
             messages.error(request, "❌ Telegram аккаунт не привязан")
@@ -166,7 +162,7 @@ class TestHabitReminderView(LoginRequiredMixin, View):
 
         try:
             habit = user_habits.first()
-            result = send_habit_reminder_task.delay(habit.id)
+            # result = send_habit_reminder_task.delay(habit.id)
             messages.success(request, f"✅ Напоминание отправлено для: {habit.action}")
         except Exception as e:
             messages.error(request, f"❌ Ошибка: {str(e)}")

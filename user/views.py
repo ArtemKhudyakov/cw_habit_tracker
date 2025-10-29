@@ -2,7 +2,7 @@ import secrets
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LogoutView
 from django.core.exceptions import PermissionDenied
@@ -12,10 +12,8 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.generic import CreateView, ListView, TemplateView, UpdateView
-from rest_framework import generics, permissions, status
+from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
-from rest_framework.filters import OrderingFilter
-from rest_framework.response import Response
 
 from .forms import UserProfileForm, UserRegistrationForm
 from .mixins import ManagerRequiredMixin

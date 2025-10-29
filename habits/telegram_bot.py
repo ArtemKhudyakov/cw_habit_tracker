@@ -58,7 +58,7 @@ class HabitTrackerBot:
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработчик команды /start"""
         chat_id = update.effective_chat.id
-        username = update.effective_user.username
+        # username = update.effective_user.username
 
         # Асинхронно проверяем, привязан ли уже этот chat_id
         existing_user = await self.get_user_by_chat_id(chat_id)

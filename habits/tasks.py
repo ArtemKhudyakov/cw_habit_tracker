@@ -52,11 +52,10 @@ def send_habit_reminder(chat_id, message):
 @shared_task
 def send_habit_reminder_task(habit_id):
     """Celery задача для отправки напоминания о привычке"""
-    from django.contrib.auth import get_user_model
 
     from .models import Habit
 
-    User = get_user_model()
+    # User = get_user_model()
 
     try:
         habit = Habit.objects.get(id=habit_id)
@@ -78,7 +77,7 @@ def send_habit_reminder_task(habit_id):
         if success:
             return f"✅ Напоминание отправлено для: {habit.action}"
         else:
-            return f"❌ Ошибка при отправке напоминания"
+            return "❌ Ошибка при отправке напоминания"
 
     except Habit.DoesNotExist:
         return "❌ Привычка не найдена"
@@ -134,16 +133,13 @@ def send_test_notification():
 def check_and_send_habit_reminders():
     """Периодическая задача для проверки и отправки напоминаний о привычках"""
     import logging
-    from datetime import datetime, time
-
     import pytz
-    from django.contrib.auth import get_user_model
     from django.utils import timezone
 
     from .models import Habit
 
     logger = logging.getLogger(__name__)
-    User = get_user_model()
+    # User = get_user_model()
 
     logger.info("=== 🔍 ЗАПУСК ПРОВЕРКИ НАПОМИНАНИЙ О ПРИВЫЧКАХ ===")
 
@@ -192,13 +188,13 @@ def check_and_send_habit_reminders():
                 elif habit.related_habit:
                     message += f"🔗 Связанная привычка: {habit.related_habit.action}\n"
 
-                message += f"\n💪 Удачи в выполнении!"
+                message += "\n💪 Удачи в выполнении!"
 
                 success = send_habit_reminder(habit.user.telegram_chat_id, message)
 
                 if success:
                     results.append(f"✅ Напоминание отправлено: {habit.action}")
-                    logger.info(f"✅ УСПЕХ: Напоминание отправлено!")
+                    logger.info("✅ УСПЕХ: Напоминание отправлено!")
                 else:
                     results.append(f"❌ Ошибка отправки: {habit.action}")
 

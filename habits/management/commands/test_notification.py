@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
-from habits.models import Habit
 from habits.tasks import send_habit_reminder, send_test_notification
 
 User = get_user_model()
